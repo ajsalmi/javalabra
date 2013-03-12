@@ -1,0 +1,9 @@
+VOKAALIPELI
+
+Aihe: peli vokaalien omaksumiseen  
+
+Toteutetaan ohjelma, joka antaa palautetta siitä kuinka hyvin tuotetut vokaalit vastaavat opeteltavan kielen vokaaleja. Käyttäjä antaa syötteen mikrofonin välityksellä, ja vokaalien samuutta tarkastellaan kahden (tai kolmen) ensimmäisen formanttitaajuuden vastaavuudella. Formanttitaajuudet lasketaan nopella fourier-transformaatiolla (tämän toteutus mahdollisesti valmiista kirjastosta).
+
+Graafinen käyttöliittymä antaa käyttäjälle visuaalista palautetta reaaliaikaisesti. Käyttöliittymästä pääsee myös määrittämään asetukset (esim. äänen sisääntuloportti).
+
+Ajatuksena olisi tehdä myös zombie-moodi, mahdollisesti kurssin ulkopuolella.
