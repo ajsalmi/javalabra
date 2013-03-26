@@ -26,4 +26,6 @@ public class VokaalipeliTest {
 
     
     // täydennä tänne testejä
+    
+    // luokille omat testit
 }

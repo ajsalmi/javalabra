@@ -3,4 +3,5 @@ Tuntikirjanpito:
 päivä	tuntia		seloste
 12.3. 	3 		GitHubin toiminnan selvittelyä yms. aloitushässäkkää
 13.3.   2  		selvittelyä, miten mikrofonista tulevan syötteen saa luettua
-19.3.   3		lisää selvittelyä äänisyötteen toiminnasta; (luokkakaavio)
+19.3.   3		lisää selvittelyä äänisyötteen käsittelystä; (luokkakaavio)
+26.3    4   		ensimmäinen versio Mikrofoni-luokasta; selvittelyä FFT:stä
