@@ -4,4 +4,18 @@ päivä	tuntia		seloste
 12.3. 	3 		GitHubin toiminnan selvittelyä yms. aloitushässäkkää
 13.3.   2  		selvittelyä, miten mikrofonista tulevan syötteen saa luettua
 19.3.   3		lisää selvittelyä äänisyötteen käsittelystä; (luokkakaavio)
-26.3    4   		ensimmäinen versio Mikrofoni-luokasta; selvittelyä FFT:stä
+26.3.   4   		ensimmäinen versio Mikrofoni-luokasta; selvittelyä FFT:stä
+29.3.	2		lueskelua ja muuta FFT-selvittelyä:	
+			--> Cormen et al.: Introduction to Algorithms (kpl 30) 
+			--> Jurafsky et al.: Speech and Language Processing 
+30.3. 	3		koodausta (FFT)
+31.3.	3		koodausta (FFT)
+1.4.	4		testejä (FFMuokkaajaTest), toimiva (lopullinen?) versio Fast Fourier -muokkaajasta
+
+
+
+
+
+
+Lyhenteet:
+FFT 	Fast Fourier Transformation
