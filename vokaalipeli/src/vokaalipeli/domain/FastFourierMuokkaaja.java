@@ -32,7 +32,7 @@ public class FastFourierMuokkaaja {
         int pituus = reaalinen.length;
 
         if (pituus != imaginaarinen.length) return null;
-        if (!onKakkosenPotenssi(pituus))return null;
+        if (pituus != jarjestysTaulukko.length)return null;
 
         double pituudenLog = Math.log(pituus) / Math.log(2); // <-- logaritmien laskukaavasta
         
