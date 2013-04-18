@@ -13,73 +13,117 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.WindowConstants;
-import vokaalipeli.domain.FastFourierMuokkaaja;
-import vokaalipeli.domain.Mikrofoni;
+import vokaalipeli.laskenta.FastFourierMuokkaaja;
 import vokaalipeli.peli.Vokaalipeli;
 
+/**
+ * Luokka koordinoi Taajuuskäyrä-olion luomista, parametrien kysymistä
+ * käyttäjältä ja niiden antamista Vokaalipeli-luokan oliolle.
+ *
+ * @author A J Salmi
+ */
 public class Kayttoliittyma implements Runnable {
 
-    private JFrame frame;
+    private JFrame paaikkuna;
     private Taajuuskayra taajuuskayra;
-    // private ??? formanttikartta;    <-----   myöhemmin
     private int korkeus;
     private int leveys;
     private Vokaalipeli peli;
     // TODO: getterit käyrille ja mitoille ?
 
+    /**
+     * Konstruktori luo Taajuuskäyrä-luokan olion saamiensa mittojen mukaisesti,
+     * kysyy kaikkia tarvittavia parametreja käyttäjältä ja
+     *
+     *
+     * [Tämä on hieman vielä kesken, pitäisi eriyttää ikkunat omiksi luokikseen
+     * jne.]
+     *
+     * @param peli vokaalipeli
+     * @param leveys luotavan pääikkunan leveys
+     * @param korkeus luotavan pääikkunan korkeus
+     * @see Vokaalipeli
+     * @see Taajuuskayra
+     */
     public Kayttoliittyma(Vokaalipeli peli, int leveys, int korkeus) {
         this.korkeus = korkeus;
         this.leveys = leveys;
         this.peli = peli;
-        this.taajuuskayra = new Taajuuskayra(korkeus-45, leveys-20);
-        kysyMikkia();
-        kysyAikaikkunanPituus();
-//        this.run();
+        this.taajuuskayra = new Taajuuskayra(korkeus - 45, leveys - 20);
+
+        kysyKayttajaltaParametrit(); // nämä kaksi voisi yhdistää yhteiseen paikkaan "kysy kaikki mahdollinen"
+        kysyAikaikkunanPituus(); // // nämä kaksi voisi yhdistää yhteiseen "kysy kaikki mahdollinen" 
     }
 
+    /**
+     * tämä todennäköisesti yhdistetään toiseen kyselyikkunaan ??? -->
+     * kysyKayttajaltaParametrit()
+     */
     private void kysyAikaikkunanPituus() {
-        // TODO: kysy käyttäjältä aikaikkunan pituus (= taajuusresoluutio)
-        
+        // TODO: kysy käyttäjältä aikaikkunan pituus (=> taajuusresoluutio)
+
         // vastaus saatu ---> 
-        int ikkunanKoko = 4096;// <-- tämä tieto käyttäjältä
-        this.peli.setIkkunanKoko(ikkunanKoko);
+        int ikkunanKoko = 1024 * 2 * 2 * 2 * 2;// <-- tämä tieto käyttäjältä
+        this.peli.setAikaikkunanKoko(ikkunanKoko);
         this.peli.setTaajuuskayra(taajuuskayra);
-        this.peli.setFastFourierMuokkaaja(new FastFourierMuokkaaja(ikkunanKoko)); 
+        this.peli.setFastFourierMuokkaaja(new FastFourierMuokkaaja(ikkunanKoko));
     }
 
+    /**
+     * Runnable-rajapinnan toteuttavan luokan run()-metodi, jossa luodaan
+     * Taajuuskayra-luokan oliota varten tyhjä ikkuna ja asetetaan se näkyviin.
+     *
+     * @see Runnable;
+     */
     @Override
     public void run() {
-        frame = new JFrame("Taajuuskäyrä");
-        frame.setPreferredSize(new Dimension(this.leveys, this.korkeus));
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        luoKomponentit(frame.getContentPane());
-        frame.pack();
-        frame.setVisible(true);
+        paaikkuna = new JFrame("Taajuuskäyrä");
+        paaikkuna.setPreferredSize(new Dimension(this.leveys, this.korkeus));
+        paaikkuna.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        luoKomponentit(paaikkuna.getContentPane());
+        paaikkuna.pack();
+        paaikkuna.setVisible(true);
     }
 
     public JFrame getFrame() {
-        return this.frame;
+        return this.paaikkuna;
     }
 
+    /**
+     * Metodi täyttää ikkunan halutuilla komponenteilla: taajuuskäyrä siihen
+     * liittyvät napit.
+     *
+     * @param container
+     */
     private void luoKomponentit(Container container) {
         container.add((Component) this.taajuuskayra);
-        // muuta tavaraa tähän: napit maxArvon muokkaamiseen?
+        // TODO: esim. alapaneeliin napit maxArvon muokkaamiseen 
+        // ja käyrän keskiarvojen määrän muokkaamiseen 
     }
 
-    private void kysyMikkia() {
-        frame = new JFrame();
-        frame.setPreferredSize(new Dimension(200, 600));
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        luoKomponentitMikinKysely(frame.getContentPane());
-        frame.pack();
-        frame.setVisible(true);
+    /**
+     * Tämä (ml. alla oleva hirviö "luoKomponentitParametrienKysely(.)")
+     * mahdolliseesti omaksi luokaksi ???
+     */
+    private void kysyKayttajaltaParametrit() {
+        JFrame kyselyIkkuna = new JFrame();
+        kyselyIkkuna.setPreferredSize(new Dimension(200, 480));
+        kyselyIkkuna.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        luoKomponentitParametrienKysely(kyselyIkkuna.getContentPane());
+        kyselyIkkuna.pack();
+        kyselyIkkuna.setVisible(true);
     }
 
-    private void luoKomponentitMikinKysely(Container container) {
+    /**
+     * tämä varmaankin erilliseen luokkaan...
+     *
+     * @param container
+     */
+    private void luoKomponentitParametrienKysely(Container container) {
         container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
         final ButtonGroup bg1 = new ButtonGroup();
-        int[] eriTaajuudet = {8000, 11025, 16000, 22050, 44100};   // kaksi suurinta pois
-        container.add(new JLabel("sampling rate"));
+        int[] eriTaajuudet = {8000, 11025, 16000, 22050, 44100};
+        container.add(new JLabel("näytteenottotaajuus"));
         JRadioButton nappi;
         for (int taajuus : eriTaajuudet) {
             nappi = new JRadioButton(taajuus + " Hz");
@@ -89,68 +133,64 @@ public class Kayttoliittyma implements Runnable {
 // --------------------------------------------------------        
         int[] sampleSizeInBits = {8, 16};
         container.add(new JLabel(" "));
-        container.add(new JLabel("sample size in bits"));
+        container.add(new JLabel("näytteen koko bitteinä"));
         ButtonGroup bg2 = new ButtonGroup();
         for (int sampleSize : sampleSizeInBits) {
-            nappi = new JRadioButton(sampleSize + " bits / sample");
+            nappi = new JRadioButton(sampleSize + " bittiä");
             bg2.add(nappi);
             container.add(nappi);
         }
-// --------------------------------------------------------
-        int[] numberOfChannels = {1, 2};
-        container.add(new JLabel(" "));
-        container.add(new JLabel("channels"));
-        ButtonGroup bg3 = new ButtonGroup();
-        for (int channels : numberOfChannels) {
-            nappi = new JRadioButton(channels + "");
-            bg3.add(nappi);
-            container.add(nappi);
-        }
 
 // --------------------------------------------------------
         container.add(new JLabel(" "));
-        container.add(new JLabel("signedness"));
-        ButtonGroup bg4 = new ButtonGroup();
-        nappi = new JRadioButton("signed");
-        bg4.add(nappi);
+        container.add(new JLabel("etumerkillisyys"));
+        ButtonGroup bg3 = new ButtonGroup();
+        nappi = new JRadioButton("etumerkillinen");
+        bg3.add(nappi);
         container.add(nappi);
-        nappi = new JRadioButton("unsigned");
-        bg4.add(nappi);
+        nappi = new JRadioButton("etumerkitön");
+        bg3.add(nappi);
         container.add(nappi);
 // --------------------------------------------------------
         container.add(new JLabel(" "));
-        container.add(new JLabel("endianness"));
-        ButtonGroup bg5 = new ButtonGroup();
+        container.add(new JLabel("tavujärjestys"));
+        ButtonGroup bg4 = new ButtonGroup();
         nappi = new JRadioButton("big-endian");
-        bg5.add(nappi);
+        bg4.add(nappi);
         container.add(nappi);
         nappi = new JRadioButton("little-endian");
-        bg5.add(nappi);
+        bg4.add(nappi);
         container.add(nappi);
 // --------------------------------------------------------
         container.add(new JLabel(" "));
-        JButton valmis = new JButton("Ready");
-        container.add(valmis);
-        valmis.addActionListener(new OmaKuuntelija(this.peli)); // ???
+        JButton aloita = new JButton("Aloita");
+        container.add(aloita);
+        aloita.addActionListener(new kaynnistysnapinKuuntelija(this.peli));
     }
 
-    private class OmaKuuntelija implements ActionListener { // nimea jotenkin paremmin
+    /**
+     * tämä kuuntelija mahdollisesti omaksi luokakseen pakkaukseen
+     * .kayttoliittyma
+     */
+    private class kaynnistysnapinKuuntelija implements ActionListener {
 
         private Vokaalipeli peli;
-        public OmaKuuntelija(Vokaalipeli peli) {
+
+        public kaynnistysnapinKuuntelija(Vokaalipeli peli) {
             this.peli = peli;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            this.peli.pysayta();
+//            this.peli.pysayta();
             // miten saan tiedot siitä, mitkä napit on valittuna ?           
 
             // ????
 
             // ---> no asetetaan sitten vain jotkut arvot 
-            AudioFormat formaatti = new AudioFormat(16000, 16, 1, true, true);
-            this.peli.setMikrofoni(new Mikrofoni(formaatti));
+            AudioFormat formaatti = new AudioFormat(44100, 16, 1, true, false);
+            this.peli.setAanilahde(new Mikrofoni(formaatti));
+            
         }
     }
 }
