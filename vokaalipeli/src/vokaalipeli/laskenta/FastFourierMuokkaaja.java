@@ -1,16 +1,37 @@
-package vokaalipeli.domain;
+package vokaalipeli.laskenta;
 
+/**
+ * Luokka laskee nopean Fourier-muunnoksen (FFT) sille annetusta 
+ * liukulukutaulukosta.
+ * 
+ * @author A J Salmi
+ */
 public class FastFourierMuokkaaja {
 
     static final double PII = Math.PI;
     int[] jarjestysTaulukko;
 
-    public FastFourierMuokkaaja(int ikkunanPituus) {
-        this.jarjestysTaulukko = luoOikeaJarjestys(ikkunanPituus);
+    /**
+    * Konstruktori, joka laskee taulukon pituuden avulla järjestyksen, 
+    * joka helpottaa FFT:n laskemista.  
+    * 
+    * @param taulukonPituus laskettavien taulukoiden pituus. Täytyy 
+    * olla kakkosen potenssi
+    */
+    public FastFourierMuokkaaja(int taulukonPituus) {
+        this.jarjestysTaulukko = luoOikeaJarjestys(taulukonPituus);
     }
 
-    public boolean asetaUusiPituus(int ikkunanPituus) {
-        int[] taulukko = luoOikeaJarjestys(ikkunanPituus);
+    /**
+    * Metodi asettaa uuden pituuden muokkaajalle, jos taulukon pituus
+    * on sallittu arvo. Palauttaa onnistumista kuvaavan totuusarvon.
+    * 
+    * @param taulukonPituus laskettavien taulukoiden pituus. Täytyy 
+    * olla kakkosen potenssi
+    * @return uuden pituuden asetuksen onnistuminen
+    */
+    public boolean asetaUusiPituus(int taulukonPituus) {
+        int[] taulukko = luoOikeaJarjestys(taulukonPituus);
         if (taulukko != null){
             this.jarjestysTaulukko = taulukko;
             return true;
@@ -18,85 +39,115 @@ public class FastFourierMuokkaaja {
         return false;
     }
 
-    public int[] getJarjestys() {
+    public int[] getJarjestys() { // onko tarpeellinen ? 
         return this.jarjestysTaulukko;
     }
 
+    /**
+    * Metodi laskee FFT:n käyttäen apuna toista samannimistä metodia.
+    * 
+    * @param arvot annetut arvot, reaalinen ja imaginaarinen
+    * @param pelkkiaReaalilukuja kertoo onko parametrina annetussa taulukossa vain reaalilukuja
+    * @return kaksiuloitteinen taulukko jossa on FFT:n reaaliset ja 
+    * imaginaariset osat omissa taulukoissaan
+    */
     public double[][] muokkaaFFT(double[][] arvot, boolean pelkkiaReaalilukuja) {
         double[] reaalinen = arvot[0];
         double[] imaginaarinen = arvot[1];
         return muokkaaFFT(reaalinen, imaginaarinen, pelkkiaReaalilukuja);
     }
 
-    public double[][] muokkaaFFT(double[] reaalinen, double[] imaginaarinen, boolean pelkkiaReaalilukuja) {
-        int pituus = reaalinen.length;
+    /**
+    * Metodi laskee FFT:n.
+    * 
+    * @param reaaliOsat annettujen lukuarvojen reaaliosat
+    * @param imaginaariOsat annettujen lukuarvojen imaginaariosat
+    * @param pelkkiaReaalilukuja kertoo onko parametrina annetussa taulukossa vain reaalilukuja
+    * @return kaksiuloitteinen taulukko jossa on FFT:n reaaliset ja 
+    * imaginaariset osat omissa taulukoissaan
+    */
+    public double[][] muokkaaFFT(double[] reaaliOsat, double[] imaginaariOsat, boolean pelkkiaReaalilukuja) {
+        int pituus = reaaliOsat.length;
 
-        if (pituus != imaginaarinen.length) return null;
+        if (pituus != imaginaariOsat.length) return null;
         if (pituus != jarjestysTaulukko.length)return null;
 
         double pituudenLog = Math.log(pituus) / Math.log(2); // <-- logaritmien laskukaavasta
         
-        reaalinen = jarjesta(reaalinen);
+        reaaliOsat = jarjesta(reaaliOsat);
         if (!pelkkiaReaalilukuja) {
-            imaginaarinen = jarjesta(imaginaarinen);  // <-- complex-to-complex -muunnoksessa tarpeen
+            imaginaariOsat = jarjesta(imaginaariOsat);  // <-- complex-to-complex -muunnoksessa tarpeen
         }
 
         /* ------ alkutoimet loppu & itse laskenta alkaa ----------------------*/
 
-        int hyppy; // kertoo kuinka monen luvun yli hypataan ettei samaa lukua kasitella kahdesti
-        double ensimmaisenJuurenEksponentti; // ykkosen 1. kompleksijuuren eksp. 
-        double ykkosenKompleksijuurenRe, ykkosenKompleksijuurenIm; // siita johdettu koordinaattiesitys
-        double ekanReaali, ekanImag; // 1. tarkasteltava kompleksiluku
-        double tokanReaali, tokanImag; // 2. tarkasteltava kompleksiluku
-        double apuReaali, apuImag; // apumuuttujat joihin tallennetaan ns. "twiddle factor"
-
         for (int kierros = 1; kierros <= (int) pituudenLog; kierros++) {
-            hyppy = (int) Math.pow(2, kierros - 1);
-            ensimmaisenJuurenEksponentti = PII / hyppy; // oikeasti juuri on muotoa: e^(2*PII/(2*hyppy))
-            for (int k = 0; k < hyppy; k++) {
-                ykkosenKompleksijuurenRe = Math.cos(k * ensimmaisenJuurenEksponentti); //  e^(i*x) = cos x + i*sinx
-                ykkosenKompleksijuurenIm = Math.sin(k * ensimmaisenJuurenEksponentti); //  e^(i*x) = cos x + i*sinx
+            
+            /**
+             * monenko luvun yli hypätään, ettei yhdellä kierroksella käsiteltäisi samaa lukua kahdesti.
+             */            
+            int hyppy = (int) Math.pow(2, kierros - 1);
 
-                for (int i = 0; i < reaalinen.length; i += 2 * hyppy) {
-                    ekanReaali = reaalinen[k + i];
-                    ekanImag = imaginaarinen[k + i];
-                    tokanReaali = reaalinen[k + hyppy + i];
-                    tokanImag = imaginaarinen[k + hyppy + i];
-                    apuReaali = tokanReaali * ykkosenKompleksijuurenRe - tokanImag * ykkosenKompleksijuurenIm;
-                    apuImag = tokanImag * ykkosenKompleksijuurenRe + tokanReaali * ykkosenKompleksijuurenIm;
-                    reaalinen[k + i] = ekanReaali + apuReaali;
-                    imaginaarinen[k + i] = ekanImag + apuImag;
-                    reaalinen[k + hyppy + i] = ekanReaali - apuReaali;
-                    imaginaarinen[k + hyppy + i] = ekanImag - apuImag;
+            /**
+             * Ykkösen ensimmäisen kompleksijuuren eksponentti. 
+             */
+            double ensimmaisenJuurenEksponentti = PII / hyppy; // oikeasti juuri on muotoa: e^(2*PII/(2*hyppy))
+            
+            for (int k = 0; k < hyppy; k++) {
+                double ykkosenJuurenReaali = Math.cos(k * ensimmaisenJuurenEksponentti); //  e^(i*x) = cos x + i*sinx
+                double ykkosenJuurenImag = Math.sin(k * ensimmaisenJuurenEksponentti); //  e^(i*x) = cos x + i*sinx
+
+                for (int i = 0; i < reaaliOsat.length; i += 2 * hyppy) {
+                    double ekanLuvunReaali = reaaliOsat[k + i];
+                    double ekanLuvunImag = imaginaariOsat[k + i];
+                    double tokanLuvunReaali = reaaliOsat[k + hyppy + i];
+                    double tokanLuvunImag = imaginaariOsat[k + hyppy + i];
+                    double apuReaali = tokanLuvunReaali * ykkosenJuurenReaali - tokanLuvunImag * ykkosenJuurenImag;
+                    double apuImag = tokanLuvunImag * ykkosenJuurenReaali + tokanLuvunReaali * ykkosenJuurenImag;
+                    reaaliOsat[k + i] = ekanLuvunReaali + apuReaali;
+                    imaginaariOsat[k + i] = ekanLuvunImag + apuImag;
+                    reaaliOsat[k + hyppy + i] = ekanLuvunReaali - apuReaali;
+                    imaginaariOsat[k + hyppy + i] = ekanLuvunImag - apuImag;
                 }
             }
         }
-        double[][] palautetaan = new double[2][pituus];
-        palautetaan[0] = reaalinen;
-        palautetaan[1] = imaginaarinen;
+        double[][] palautetaan = {reaaliOsat, imaginaariOsat};
         return palautetaan;
     }
 
-    private int[] luoOikeaJarjestys(int ikkunanPituus) {
-        if (!onKakkosenPotenssi(ikkunanPituus)) return null;
+    /**
+     * Metodi luo tietyn mittaiselle taulukolle järjestyksen, joka helpottaa
+     * FFT:n laskemista.
+     * 
+     * @param taulukonPituus laskettavien taulukkojen pituus, jonka täytyy olla kakkosen potenssi
+     * @return järjestyksen kertova taulukko tai null, jos pituus on virheellinen
+     */
+    private int[] luoOikeaJarjestys(int taulukonPituus) {
+        if (!onKakkosenPotenssi(taulukonPituus)) return null;
         
-        int[] luvut = new int[ikkunanPituus];
-        for (int i = 0; i < ikkunanPituus; i++) {
-            luvut[i] = i;
+        int[] jarjestys = new int[taulukonPituus];
+        for (int i = 0; i < taulukonPituus; i++) {
+            jarjestys[i] = i;
         }
-        for (int patkanPituus = ikkunanPituus; patkanPituus > 2; patkanPituus /= 2) {
-            for (int missaMennaan = 0; missaMennaan < ikkunanPituus; missaMennaan += patkanPituus) {
+        for (int patkanPituus = taulukonPituus; patkanPituus > 2; patkanPituus /= 2) {
+            for (int missaMennaan = 0; missaMennaan < taulukonPituus; missaMennaan += patkanPituus) {
                 int[] parittomatMuistiin = new int[patkanPituus / 2];
                 for (int j = 0; j < patkanPituus; j += 2) {
-                    parittomatMuistiin[j / 2] = luvut[missaMennaan + j + 1];
-                    luvut[missaMennaan + j / 2] = luvut[missaMennaan + j];  // <--- siirretään parilliset vasempaan laitaan
+                    parittomatMuistiin[j / 2] = jarjestys[missaMennaan + j + 1]; // pariton muistiin
+                    jarjestys[missaMennaan + j / 2] = jarjestys[missaMennaan + j];  // parillinen pätkän vasempaan laitaan
                 }
-                System.arraycopy(parittomatMuistiin, 0, luvut, missaMennaan + patkanPituus / 2, patkanPituus / 2 - 1);
+                System.arraycopy(parittomatMuistiin, 0, jarjestys, missaMennaan + patkanPituus / 2, patkanPituus / 2 - 1);
             }
         }
-        return luvut;
+        return jarjestys;
     }
-
+/**
+ * Metodi järjestää annetun taulukon sellaiseen järjestykseen, joka helpottaa merkittävästi
+ * FFT:n laskemista.
+ * 
+ * @param jarjestettava taulukko joka halutaan FFT:ta helpottavaan järjestykseen
+ * @return järjestetyt arvot
+ */ 
     private double[] jarjesta(double[] jarjestettava) {
         double[] jarjestetty = new double[jarjestettava.length];
         for (int i = 0; i < jarjestettava.length; i++) {
@@ -105,10 +156,16 @@ public class FastFourierMuokkaaja {
         return jarjestetty;
     }
 
+    /**
+     * Metodi tarkistaa onko annettu luku kakkosen potenssi.
+     * 
+     * @param luku tarkistettava luku
+     * @return tieto siitä onko annettu luku kakkosen potenssi
+     */
     private boolean onKakkosenPotenssi(int luku) {
         if (luku <= 0) return false;
         
-        double logaritmi = Math.log(luku) / Math.log(2); // <-- logaritmien laskukaavasta
+        double logaritmi = Math.log(luku) / Math.log(2); // logaritmien laskukaavasta
         if (((int) logaritmi) - logaritmi == 0) {
             return true;
         }

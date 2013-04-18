@@ -11,10 +11,14 @@ päivä	tuntia		seloste
 30.3. 	3		koodausta (FFT)
 31.3.	3		koodausta (FFT)
 1.4.	4		testejä (FFMuokkaajaTest), toimiva (lopullinen?) versio Fast Fourier -muokkaajasta
-
-
-
-
+4.4.	4		käyttöliittymää, JPanel
+5.4.	5		käyttöliittymää, käyrän visualisointiin liittyvää koodausta (esim. eksponentiaalinen tasoitus, keskiarvoja)
+6.4.	4		käyttöliittymää, eri parametrien vaikutuksen arviointia,  
+7.4.	2		lisää käyrän esitykseen ja muokkauseen liittyen
+9.4.	1,5		pajassa työstä keskustelua (yllättäviä huomioita ohjelman toiminnasta eri koneilla) 
+9.4.	3		muokkasin Taajuuskayran käyttämään Timer-luokan oliota säännölliseen päivitykseen, ja poistin mukautuvan aikaikkunan koon (=> päivitystaajuuden)
+16.4	5		otin sittenkin pois Timerin; en ole varma onko FFT laskettu oikeinpäin, nimittäin ykkösen ensimmäisen juuren pitäisi olla ensimmäinen vastapäivään (= negatiivinen eksponentti) eikä myötäpäivään...  
+17.4.	6		päivitin luokkakaavion, tein JavaDocit luokille, huomasin että ikkunafunktion laskeminen hidastaa merkittävästi laskemista pienemmillä taajuuksilla, missä voi olla syy nykimiseen.
 
 
 Lyhenteet:

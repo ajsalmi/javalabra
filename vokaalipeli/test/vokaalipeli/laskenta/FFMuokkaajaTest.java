@@ -1,8 +1,9 @@
+package vokaalipeli.laskenta;
+
 
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import vokaalipeli.domain.FastFourierMuokkaaja;
 
 public class FFMuokkaajaTest {
     private FastFourierMuokkaaja muokkaaja;
@@ -13,14 +14,20 @@ public class FFMuokkaajaTest {
     }
 
     @Test
-    public void talukkoEiOleNull() {
+    public void taulukkoEiOleNullLuotaessa() {
         assertNotNull(this.muokkaaja.getJarjestys());
     }
 
     @Test
-    public void talukkoOnNullJosPituusEiOleKakkosenPotenssi() {
+    public void taulukkoEiAsetaUuttaJarjestystaJosPituusEiOleKakkosenPotenssi() {
         this.muokkaaja.asetaUusiPituus(7);
-        assertNull(this.muokkaaja.getJarjestys());
+        assertNotNull(this.muokkaaja.getJarjestys());
+    }
+        
+    @Test
+    public void taulukkoOnNullJosKonstruktorissaAnnetaanSopimatonPituus() {
+        FastFourierMuokkaaja muokkaaja2 = new FastFourierMuokkaaja(7);
+        assertNull(muokkaaja2.getJarjestys());
     }
 
     @Test
