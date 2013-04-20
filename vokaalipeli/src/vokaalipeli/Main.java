@@ -12,14 +12,15 @@ import vokaalipeli.peli.Vokaalipeli;
 public class Main {
     
     /**
+     * @param args the command line arguments
      * @see Kayttoliittyma
      * @see Vokaalipeli
      */
     public static void main(String[] args) {
         
         Vokaalipeli peli = new Vokaalipeli();
-        Kayttoliittyma testikayttis = new Kayttoliittyma(peli, 1000, 400);
-        testikayttis.run();
+        Kayttoliittyma kayttis = new Kayttoliittyma(peli, 1000, 400);
+        kayttis.run();
         while (peli.getStriimi() == null) {
             try {
                 Thread.sleep(10);

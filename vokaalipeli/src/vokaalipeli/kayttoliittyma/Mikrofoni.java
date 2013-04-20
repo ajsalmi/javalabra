@@ -6,7 +6,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
-import vokaalipeli.domain.AaniLahde;
 
 /**
  * Mikrofoni toteuttaa rajapinnan AaniLahde, ja sen muuttujana on 
@@ -21,7 +20,7 @@ public class Mikrofoni implements AaniLahde {
     private AudioInputStream striimi;
 
     /**
-     * Konstruktori, kutsuu metodia luoInputStream(.) parametrina saamallaan
+     * Konstruktori, kutsuu metodia luoInputStream parametrina saamallaan
      * formaatilla.
      * 
      * @param formaatti ääniformaatti 

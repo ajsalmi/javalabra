@@ -5,29 +5,19 @@
 package vokaalipeli.kayttoliittyma;
 
 import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  *
- * @author pikkupomo
+ * @author A J Salmi
  */
 public class TaajuuskayraTest {
     
     public TaajuuskayraTest() {
     }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
+ 
     @Before
     public void setUp() {
     }
@@ -38,6 +28,8 @@ public class TaajuuskayraTest {
     // TODO add test methods here.
     // The methods must be annotated with annotation @Test. For example:
     //
-    // @Test
-    // public void hello() {}
+     @Test
+     public void hello() {
+         assertTrue(true);
+     }
 }

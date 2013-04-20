@@ -1,7 +1,4 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package vokaalipeli.kayttoliittyma;
 
 import org.junit.After;
@@ -13,7 +10,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author pikkupomo
+ * @author A J Salmi
  */
 public class KayttoliittymaTest {
     
@@ -38,6 +35,8 @@ public class KayttoliittymaTest {
     // TODO add test methods here.
     // The methods must be annotated with annotation @Test. For example:
     //
-    // @Test
-    // public void hello() {}
+     @Test
+     public void hello() {
+         assertTrue(true);
+     }
 }

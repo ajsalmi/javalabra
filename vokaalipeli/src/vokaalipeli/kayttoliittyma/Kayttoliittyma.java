@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.WindowConstants;
 import vokaalipeli.laskenta.FastFourierMuokkaaja;
+import vokaalipeli.laskenta.Ikkunafunktio;
 import vokaalipeli.peli.Vokaalipeli;
 
 /**
@@ -49,24 +50,11 @@ public class Kayttoliittyma implements Runnable {
         this.korkeus = korkeus;
         this.leveys = leveys;
         this.peli = peli;
-        this.taajuuskayra = new Taajuuskayra(korkeus - 45, leveys - 20);
+
 
         kysyKayttajaltaParametrit(); // nämä kaksi voisi yhdistää yhteiseen paikkaan "kysy kaikki mahdollinen"
-        kysyAikaikkunanPituus(); // // nämä kaksi voisi yhdistää yhteiseen "kysy kaikki mahdollinen" 
-    }
 
-    /**
-     * tämä todennäköisesti yhdistetään toiseen kyselyikkunaan ??? -->
-     * kysyKayttajaltaParametrit()
-     */
-    private void kysyAikaikkunanPituus() {
-        // TODO: kysy käyttäjältä aikaikkunan pituus (=> taajuusresoluutio)
-
-        // vastaus saatu ---> 
-        int ikkunanKoko = 1024 * 2 * 2 * 2 * 2;// <-- tämä tieto käyttäjältä
-        this.peli.setAikaikkunanKoko(ikkunanKoko);
-        this.peli.setTaajuuskayra(taajuuskayra);
-        this.peli.setFastFourierMuokkaaja(new FastFourierMuokkaaja(ikkunanKoko));
+        this.taajuuskayra = new Taajuuskayra(korkeus - 45, leveys - 20, 60000);
     }
 
     /**
@@ -90,8 +78,9 @@ public class Kayttoliittyma implements Runnable {
     }
 
     /**
-     * Metodi täyttää ikkunan halutuilla komponenteilla: taajuuskäyrä siihen
-     * liittyvät napit.
+     * Metodi täyttää ikkunan halutuilla komponenteilla: taajuuskäyrä 
+     * 
+     * TODO: ... ja liittyvät säätönapit.
      *
      * @param container
      */
@@ -102,8 +91,7 @@ public class Kayttoliittyma implements Runnable {
     }
 
     /**
-     * Tämä (ml. alla oleva hirviö "luoKomponentitParametrienKysely(.)")
-     * mahdolliseesti omaksi luokaksi ???
+     * Tämä omaksi luokakseen ???
      */
     private void kysyKayttajaltaParametrit() {
         JFrame kyselyIkkuna = new JFrame();
@@ -182,15 +170,25 @@ public class Kayttoliittyma implements Runnable {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-//            this.peli.pysayta();
+            // TODO: kysy käyttäjältä aikaikkunan pituus (=> taajuusresoluutio)
+
+            // vastaus saatu ---> 
+            Ikkunafunktio funktio = Ikkunafunktio.HANN;// tämä ei tule tähän lopullisessa versiossa
+            this.peli.setIkkunafunktio(funktio);
+            // -----
+            int ikkunanKoko = 1024 * 2 * 2 * 2 * 2;// <-- tämä tieto käyttäjältä
+            this.peli.setAikaikkunanKoko(ikkunanKoko);
+            this.peli.setTaajuuskayra(taajuuskayra);
+            this.peli.setFastFourierMuokkaaja(new FastFourierMuokkaaja(ikkunanKoko));
+
+
             // miten saan tiedot siitä, mitkä napit on valittuna ?           
 
             // ????
 
             // ---> no asetetaan sitten vain jotkut arvot 
-            AudioFormat formaatti = new AudioFormat(44100, 16, 1, true, false);
+            AudioFormat formaatti = new AudioFormat(16000, 16, 1, true, true);
             this.peli.setAanilahde(new Mikrofoni(formaatti));
-            
         }
     }
 }

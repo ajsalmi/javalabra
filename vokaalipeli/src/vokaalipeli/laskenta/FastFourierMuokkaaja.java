@@ -12,31 +12,14 @@ public class FastFourierMuokkaaja {
     int[] jarjestysTaulukko;
 
     /**
-    * Konstruktori, joka laskee taulukon pituuden avulla järjestyksen, 
-    * joka helpottaa FFT:n laskemista.  
-    * 
-    * @param taulukonPituus laskettavien taulukoiden pituus. Täytyy 
-    * olla kakkosen potenssi
-    */
+     * Konstruktori, joka laskee taulukon pituuden avulla järjestyksen, 
+     * joka helpottaa FFT:n laskemista.  
+     * 
+     * @param taulukonPituus laskettavien taulukoiden pituus. Täytyy 
+     * olla kakkosen potenssi
+     */
     public FastFourierMuokkaaja(int taulukonPituus) {
         this.jarjestysTaulukko = luoOikeaJarjestys(taulukonPituus);
-    }
-
-    /**
-    * Metodi asettaa uuden pituuden muokkaajalle, jos taulukon pituus
-    * on sallittu arvo. Palauttaa onnistumista kuvaavan totuusarvon.
-    * 
-    * @param taulukonPituus laskettavien taulukoiden pituus. Täytyy 
-    * olla kakkosen potenssi
-    * @return uuden pituuden asetuksen onnistuminen
-    */
-    public boolean asetaUusiPituus(int taulukonPituus) {
-        int[] taulukko = luoOikeaJarjestys(taulukonPituus);
-        if (taulukko != null){
-            this.jarjestysTaulukko = taulukko;
-            return true;
-        }
-        return false;
     }
 
     public int[] getJarjestys() { // onko tarpeellinen ? 
@@ -67,10 +50,21 @@ public class FastFourierMuokkaaja {
     * imaginaariset osat omissa taulukoissaan
     */
     public double[][] muokkaaFFT(double[] reaaliOsat, double[] imaginaariOsat, boolean pelkkiaReaalilukuja) {
-        int pituus = reaaliOsat.length;
 
-        if (pituus != imaginaariOsat.length) return null;
-        if (pituus != jarjestysTaulukko.length)return null;
+        if (imaginaariOsat == null) {
+            throw new IllegalArgumentException("annettu imaginaaritaulukko on null");
+        }
+        if (reaaliOsat == null){
+            throw new IllegalArgumentException("annettu reaalitaulukko on null");
+        }
+        
+        int pituus = reaaliOsat.length;
+        if (pituus != imaginaariOsat.length) {
+            throw new IllegalArgumentException("reaali- ja imaginaaritalukot eripituiset");        
+        }
+        if (pituus != jarjestysTaulukko.length) {
+            throw new IllegalArgumentException("annettu taulukko ei ole samanmittainen kuin muokkaajan");
+        }
 
         double pituudenLog = Math.log(pituus) / Math.log(2); // <-- logaritmien laskukaavasta
         
@@ -141,13 +135,14 @@ public class FastFourierMuokkaaja {
         }
         return jarjestys;
     }
-/**
- * Metodi järjestää annetun taulukon sellaiseen järjestykseen, joka helpottaa merkittävästi
- * FFT:n laskemista.
- * 
- * @param jarjestettava taulukko joka halutaan FFT:ta helpottavaan järjestykseen
- * @return järjestetyt arvot
- */ 
+
+    /**
+     * Metodi järjestää annetun taulukon sellaiseen järjestykseen, joka helpottaa merkittävästi
+     * FFT:n laskemista.
+     * 
+     * @param jarjestettava taulukko joka halutaan FFT:ta helpottavaan järjestykseen
+     * @return järjestetyt arvot
+     */ 
     private double[] jarjesta(double[] jarjestettava) {
         double[] jarjestetty = new double[jarjestettava.length];
         for (int i = 0; i < jarjestettava.length; i++) {

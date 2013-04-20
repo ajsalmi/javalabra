@@ -1,14 +1,15 @@
-package vokaalipeli.domain;
+package vokaalipeli.kayttoliittyma;
 
 import javax.sound.sampled.AudioInputStream;
 
 /**
- * Rajapinta, joka mahdollistaa Vokaalipelille äänisyötteen vastaanottamisen
- * myös muista lähteistä, esim. nauhoitetuista vokaalinäytteistä.
+ * Rajapinta äänilähteille. Tässä projektissa äänilähteenä toimii mikrofoni,
+ * mutta rajapinnan avulla on helppoa myöhemmin laajentaa muihin lähteisiin 
+ * (esim. nauhoitettuihin ääninäytteisiin).
  *
  * @author A J Salmi
  *
- * @see AaniLahde
+ * @see Mikrofoni
  */
 public interface AaniLahde {
 

@@ -5,82 +5,52 @@ import java.awt.Graphics;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import javax.swing.JPanel;
+import vokaalipeli.domain.Vokaali;
 
 /**
- * Luokka vastaa taajuuskäyrän piirtämisestä/päivittämisestä. Se myös laskee 
- * visualisointia varten viimeisimpien käyrien keskiarvon (aikasarjan suuntaisesti).
+ * Luokka vastaa taajuuskäyrän piirtämisestä/päivittämisestä.
  *
  * @author A J Salmi
  */
 public class Taajuuskayra extends JPanel {
-//   TODO: private Vokaali verrattava;
-
+    
+    private Vokaali verrattavaVokaali;
     private int korkeus;
     private int leveys;
-    private double[] edellistenKeskiarvo;
-    private int monenkoKeskiarvoLasketaan = 1; // TODO: kysy tätä käyttäjältä
-    private Queue<double[]> edelliset = new ArrayDeque<>();
+    private double[] arvot;
     private double[] suhteellisetTaajuudet;   // eka on 0 ja viimeinen on 1 
     private double maxArvo;
-    private boolean arvotValmiina;
-    private boolean piirtoValmiina;
 
     /**
      * Konstruktori. 
      * 
      * @param korkeus piirtoalustan korkeus 
      * @param leveys piirtoalustan leveys
+     * @param maxArvo määrittää sen, kuinka suuret arvot mahtuvat kuvaajaan
      */
-    public Taajuuskayra(int korkeus, int leveys) {
+    public Taajuuskayra(int korkeus, int leveys, int maxArvo) {
         super.setBackground(Color.DARK_GRAY);
         this.korkeus = korkeus;
         this.leveys = leveys;
-        this.maxArvo = 60000;     // TODO: kysy tätä käyttäjältä ???
-        this.piirtoValmiina = true;
-        this.arvotValmiina = true;
+        this.maxArvo = maxArvo;
     }
 
-    public boolean odottaaArvoja() {
-        return this.piirtoValmiina;
+    public void setVokaali (Vokaali v){
+        this.verrattavaVokaali = v;
     }
-
+    
     /**
-     * Metodi ottaa vastaan uudet arvot, laskee edellisten käyrien keskiarvon
-     * ja kutsuu piirtämismetodia.
+     * Metodi ottaa vastaan uudet arvot ja kutsuu piirtämismetodia.
      * 
      * @param uudetArvot taajuuskäyrälle syötetyt uudet arvot 
      */
     public void setArvot(double[] uudetArvot) {
 
-        while (!piirtoValmiina) {
-            try {
-                Thread.sleep(0, 1);
-            } catch (InterruptedException ex) {
-            }
-        }
-
-        if (this.edellistenKeskiarvo == null || edellistenKeskiarvo.length != uudetArvot.length) {
-            this.edellistenKeskiarvo = new double[uudetArvot.length];
-        }
-
-        if (this.suhteellisetTaajuudet == null || suhteellisetTaajuudet.length != uudetArvot.length) {
+        if (this.suhteellisetTaajuudet == null ){//|| suhteellisetTaajuudet.length != uudetArvot.length) {
             luoTasavalisetTaajuudet(uudetArvot.length);
         }
 
-        edelliset.add(uudetArvot);
-        for (int i = 0; i < uudetArvot.length; i++) {
-            edellistenKeskiarvo[i] += uudetArvot[i] / monenkoKeskiarvoLasketaan;
-        }
-
-        if (edelliset.size() >= monenkoKeskiarvoLasketaan + 1) {
-            double[] poisOtettu = edelliset.poll();
-            for (int i = 0; i < uudetArvot.length; i++) {
-                edellistenKeskiarvo[i] -= poisOtettu[i] / monenkoKeskiarvoLasketaan;
-            }
-        }
-
-        arvotValmiina = true;
-        piirtoValmiina = false;
+        this.arvot = uudetArvot;
         paivita();
     }
 
@@ -106,39 +76,30 @@ public class Taajuuskayra extends JPanel {
         g.setColor(Color.WHITE);
         g.fill3DRect(2, 2, leveys, korkeus, true);
 
-        if (edellistenKeskiarvo == null || suhteellisetTaajuudet == null) {
+        if (arvot == null || suhteellisetTaajuudet == null) {
             return;
         }
 
         //
         // TODO: piirrä vokaalin formantit esim. keltaisella
         //
+        if (verrattavaVokaali!=null){
+            piirraVokaalinFormantit();
+        }
 
         g.setColor(Color.BLACK);
-        for (int i = 0; i < edellistenKeskiarvo.length - 1; i++) {
+        for (int i = 0; i < arvot.length - 1; i++) {
             piirraViiva(g, i, 1);
         }
 
         g.setColor(Color.GRAY);
         g.draw3DRect(2, 2, leveys, korkeus, true);
-
-        // piirto valmis
-        piirtoValmiina = true;
-        arvotValmiina = false;
     }
 
     /**
      * Metodi kutsuu yläluokan (JPanel) repaint()-metodia.
      */
     public void paivita() {
-        
-        while (!arvotValmiina){
-            try {
-                Thread.sleep(0,1);
-            } catch (InterruptedException ex) {
-//                Logger.getLogger(Taajuuskayra.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
         repaint();
     }
 
@@ -150,19 +111,19 @@ public class Taajuuskayra extends JPanel {
      * @param viivanPaksuus viivan paksuus leveyssuunnassa
      */
     private void piirraViiva(Graphics grafiikka, int i, int viivanPaksuus) {
-        if (edellistenKeskiarvo == null || suhteellisetTaajuudet == null) { // onko tarpeen?
+        if (arvot == null || suhteellisetTaajuudet == null) { // onko tarpeen?
             return;
         }
-        if (edellistenKeskiarvo.length != suhteellisetTaajuudet.length) { // onko tarpeen?
+        if (arvot.length != suhteellisetTaajuudet.length) { // onko tarpeen?
             return;
         }
 
         int alkuX, alkuY, loppuX, loppuY;
         for (int j = 0; j < viivanPaksuus; j++) {
             alkuX = (int) (leveys * suhteellisetTaajuudet[i]) + j;
-            alkuY = (int) (korkeus * (1 - edellistenKeskiarvo[i] / maxArvo));
+            alkuY = (int) (korkeus * (1 - arvot[i] / maxArvo));
             loppuX = (int) (leveys * suhteellisetTaajuudet[i + 1]) + j;
-            loppuY = (int) (korkeus * (1 - edellistenKeskiarvo[i + 1] / maxArvo));
+            loppuY = (int) (korkeus * (1 - arvot[i + 1] / maxArvo));
             grafiikka.drawLine(alkuX, alkuY, loppuX, loppuY);
         }
     }
@@ -171,7 +132,7 @@ public class Taajuuskayra extends JPanel {
      * Metodi luo tasaväliset taajuudet jakamalla käyrän leveyden annettuun
      * määrään pisteitä.
      * 
-     * @param taajuuksia montako eri tasavälistä taajuutta käyrässä esitetään 
+     * @param taajuuksia moneenko eri tasaväliseen pisteeseen taajuudet jakautuvat.  
      */
     private void luoTasavalisetTaajuudet(int taajuuksia) {
         double[] tasavalisetTaajuudet = new double[taajuuksia];
@@ -179,5 +140,15 @@ public class Taajuuskayra extends JPanel {
             tasavalisetTaajuudet[i] = (i + 1.0) / (taajuuksia + 1.0);
         }
         suhteellisetTaajuudet = tasavalisetTaajuudet;
+    }
+
+    /**
+     * Metodi piirtää verrattavan vokaalin formanttitaajuudet käyrälle.
+     * 
+     */
+    private void piirraVokaalinFormantit() {
+        
+        // TODO
+        
     }
 }

@@ -1,6 +1,7 @@
 Tuntikirjanpito:
 
 päivä	tuntia		seloste
+
 12.3. 	3 		GitHubin toiminnan selvittelyä yms. aloitushässäkkää
 13.3.   2  		selvittelyä, miten mikrofonista tulevan syötteen saa luettua
 19.3.   3		lisää selvittelyä äänisyötteen käsittelystä; (luokkakaavio)
@@ -19,6 +20,9 @@ päivä	tuntia		seloste
 9.4.	3		muokkasin Taajuuskayran käyttämään Timer-luokan oliota säännölliseen päivitykseen, ja poistin mukautuvan aikaikkunan koon (=> päivitystaajuuden)
 16.4	5		otin sittenkin pois Timerin; en ole varma onko FFT laskettu oikeinpäin, nimittäin ykkösen ensimmäisen juuren pitäisi olla ensimmäinen vastapäivään (= negatiivinen eksponentti) eikä myötäpäivään...  
 17.4.	6		päivitin luokkakaavion, tein JavaDocit luokille, huomasin että ikkunafunktion laskeminen hidastaa merkittävästi laskemista pienemmillä taajuuksilla, missä voi olla syy nykimiseen.
+18.4. 	5		uusia luokkia: Ikkunafuntio, IkkunafunktionLaskija
+19.4.	5		testejä (Vokaali, VokaaliInventorio), pieniä muutoksia
+20.4.	2 		Taajuuskayralta laskentaa pois --> KeskiarvonLaskijalle, viilausta  
 
 
 Lyhenteet:
