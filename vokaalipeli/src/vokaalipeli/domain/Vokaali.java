@@ -10,9 +10,7 @@ import java.util.Objects;
 public class Vokaali {
 
     private String nimi;  // IPA unicode (??) / latinalaisilla aakkosilla(?)/ niinkuin kielessä kirjoitetaan ? / esimerkkisana ?
-    private int ekaFormantti;
-    private int tokaFormantti;
-    private int kolmasFormantti;
+    private int[] formantit = new int[3];
 
     /**
      * Konstruktori.
@@ -24,9 +22,9 @@ public class Vokaali {
      */
     public Vokaali(String nimi, int ekaFormantti, int tokaFormantti, int kolmasFormantti) {
         this.nimi = nimi;
-        this.ekaFormantti = ekaFormantti;
-        this.tokaFormantti = tokaFormantti;
-        this.kolmasFormantti = kolmasFormantti;
+        this.formantit[0] = ekaFormantti;
+        this.formantit[1] = tokaFormantti;
+        this.formantit[2] = kolmasFormantti;
     }
 
 
@@ -43,9 +41,9 @@ public class Vokaali {
         if (this.getClass() != o.getClass()) return false;
         
         Vokaali verratava = (Vokaali) o;   
-        if (this.ekaFormantti != verratava.ekaFormantti) return false;
-        if (this.tokaFormantti != verratava.tokaFormantti) return false;
-        if (this.kolmasFormantti != verratava.kolmasFormantti) return false;
+        if (this.formantit[0] != verratava.formantit[0]) return false;
+        if (this.formantit[1] != verratava.formantit[1]) return false;
+        if (this.formantit[2] != verratava.formantit[2]) return false;
         if (!this.nimi.equals(verratava.nimi)) return false;
         
         return true;
@@ -59,9 +57,9 @@ public class Vokaali {
     public int hashCode() {
         int hash = 7;
         hash = 97 * hash + Objects.hashCode(this.nimi);
-        hash = 97 * hash + this.ekaFormantti;
-        hash = 97 * hash + this.tokaFormantti;
-        hash = 97 * hash + this.kolmasFormantti;
+        hash = 97 * hash + formantit[0];//this.ekaFormantti;
+        hash = 97 * hash + formantit[1];//this.tokaFormantti;
+        hash = 97 * hash + formantit[2];//this.kolmasFormantti;
         return hash;
     }
 
@@ -69,15 +67,19 @@ public class Vokaali {
         return this.nimi;
     }
 
+    public int[] getFormantit(){
+        return this.formantit;
+    }
+    
     public int getEkaFormantti() {
-        return this.ekaFormantti;
+        return formantit[0];
     }
 
     public int getTokaFormantti() {
-        return this.tokaFormantti;
+        return formantit[1];
     }
 
     public int getKolmasFormantti() {
-        return this.kolmasFormantti;
+        return formantit[2];
     }
 }

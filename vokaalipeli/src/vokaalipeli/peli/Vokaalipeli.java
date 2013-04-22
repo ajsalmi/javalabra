@@ -2,15 +2,16 @@ package vokaalipeli.peli;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Queue;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import vokaalipeli.kayttoliittyma.AaniLahde;
+import vokaalipeli.kayttoliittyma.Kayttoliittyma;
 import vokaalipeli.kayttoliittyma.Taajuuskayra;
 import vokaalipeli.laskenta.FastFourierMuokkaaja;
 import vokaalipeli.laskenta.Ikkunafunktio;
 import vokaalipeli.laskenta.IkkunafunktionLaskija;
+import vokaalipeli.laskenta.KeskiarvonLaskija;
 
 /**
  * Luokka sisältää keskeisimmät osat koko ohjelmasta. Se ottaa talteen
@@ -25,13 +26,13 @@ import vokaalipeli.laskenta.IkkunafunktionLaskija;
  */
 public class Vokaalipeli {
 
+    private Kayttoliittyma kayttis;
     private FastFourierMuokkaaja muokkaaja;
-    private Taajuuskayra kayra;
+    private KeskiarvonLaskija keskiarvonLaskija;
     private AaniLahde aanilahde;
     private int aikaikkunanPituus;          // täytyy olla kakkosen potenssi
     private double siirtyma;                // paljonko aikaikkunaa siirretään kerralla
     private boolean jatkuu;                 // tarvitaanko jos pelistä pääsee vain pois??
-    private Ikkunafunktio ikkunaFunktio;
     private IkkunafunktionLaskija ikkunaFunktionLaskija;
 
     public void setAanilahde(AaniLahde a) {
@@ -44,7 +45,7 @@ public class Vokaalipeli {
     }
 
     public void setIkkunafunktio(Ikkunafunktio funktio) {
-        this.ikkunaFunktio = funktio;
+        this.ikkunaFunktionLaskija = new IkkunafunktionLaskija(aikaikkunanPituus, funktio);
     }
 
     /**
@@ -52,6 +53,10 @@ public class Vokaalipeli {
      */
     public void pysayta() {
         this.jatkuu = false;
+    }
+    
+    public void jatka(){
+        this.jatkuu = true;
     }
 
     /**
@@ -76,10 +81,18 @@ public class Vokaalipeli {
         boolean bigEndian = formaatti.isBigEndian();
 
         int laskuri = 0;
-//        ArrayList<double[][]> kasiteltavatAikaikkunat = new ArrayList<>();
         Queue<double[][]> kasiteltavat = new ArrayDeque<>();
         
-        while (this.jatkuu) {
+        while (true) {  // ikuinen looppi !
+            
+            while(!this.jatkuu){
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException ex) {
+//                    Logger.getLogger(Vokaalipeli.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
             double luettuArvo = lueArvo(bigEndian, tavuaPerNayte);
 
             if (laskuri >= siirtyma) {
@@ -92,14 +105,14 @@ public class Vokaalipeli {
 
                 if (indeksi == aikaikkunanPituus - 1) {
                     ikkuna[1] = new double[aikaikkunanPituus];
-                    ikkuna = this.muokkaaja.muokkaaFFT(ikkuna, true);
-                    double[] amplitudit = laskeAmplitudit(ikkuna);
-                    kayra.setArvot(amplitudit);
+                    ikkuna = muokkaaja.muokkaaFFT(ikkuna, true);
+                    double[] valmiitArvot = laskeAmplitudit(ikkuna);
+                    valmiitArvot = keskiarvonLaskija.laske(valmiitArvot);
+                    kayttis.asetaArvotKayralle(valmiitArvot);
                     kasiteltavat.poll();
                 }
-                ikkuna[0][indeksi] = luettuArvo * ikkunaFunktionLaskija.annaKerroin(indeksi);// laskeIkkunafunktio(indeksi, 0); // !!!! kysy käyttäjältä!!!
+                ikkuna[0][indeksi] = luettuArvo * ikkunaFunktionLaskija.annaKerroin(indeksi);
                 ikkuna[1][0] = indeksi + 1; // talletetaan indeksi käyttämättömään imaginaariosataulukkoon
-            
             }
             laskuri++;
         }
@@ -108,16 +121,17 @@ public class Vokaalipeli {
     public void setAikaikkunanKoko(int ikkunanKoko) {
         if (onKakkosenPotenssi(ikkunanKoko)) {
             this.aikaikkunanPituus = ikkunanKoko;
-            this.ikkunaFunktionLaskija = new IkkunafunktionLaskija(ikkunanKoko, this.ikkunaFunktio);
+            this.keskiarvonLaskija = new KeskiarvonLaskija(ikkunanKoko/2); // luodaan keskiarvolla 1
+            this.muokkaaja = new FastFourierMuokkaaja(aikaikkunanPituus);
         }
     }
 
-    public void setFastFourierMuokkaaja(FastFourierMuokkaaja muokkaaja) {
-        this.muokkaaja = muokkaaja;
-    }
+//    public void setFastFourierMuokkaaja(FastFourierMuokkaaja muokkaaja) {
+//        this.muokkaaja = muokkaaja;
+//    }
 
-    public void setTaajuuskayra(Taajuuskayra kayra) {  // ???
-        this.kayra = kayra;
+    public void setKayttoliittyma(Kayttoliittyma kayttis) {
+        this.kayttis = kayttis;
     }
 
     /**
@@ -183,7 +197,6 @@ public class Vokaalipeli {
             }
         } catch (IOException exc) {
         }
-
         return arvo;
     }
 

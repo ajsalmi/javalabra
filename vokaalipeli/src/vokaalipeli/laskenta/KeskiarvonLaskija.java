@@ -6,7 +6,8 @@ import java.util.Queue;
 /**
  * Luokka laskee edellisten taulukoiden keskiarvon (aikasarjan suuntaisesti)
  *
- * TODO: ja tasoittaa myös taulukon arvoja (keskiarvo viereisistä indekseistä) ???.
+ * TODO: ja tasoittaa myös taulukon arvoja (keskiarvo taulukon viereisissä 
+ * indekseissä olevista arvoista) ???.
  *
  * @author A J Salmi
  */
@@ -21,19 +22,20 @@ public class KeskiarvonLaskija {
         this.edelliset = new ArrayDeque<>();
     }
 
-    public KeskiarvonLaskija(int taulukonPituus, int monenkoKeskiarvo) {
-        this(taulukonPituus);
-        if (monenkoKeskiarvo > 1) {
-            this.monenkoKeskiarvoLasketaan = monenkoKeskiarvo;
-        }
-    }
+//    public KeskiarvonLaskija(int taulukonPituus, int monenkoKeskiarvo) {
+//        this(taulukonPituus);
+//        if (monenkoKeskiarvo > 1) {
+//            this.monenkoKeskiarvoLasketaan = monenkoKeskiarvo;
+//        }
+//    }
     
-    public void setKeskiarvojenLkm (int monenkoKeskiarvo){
+    public void setLaskettavienKeskiarvojenLkm (int monenkoKeskiarvo){
         this.monenkoKeskiarvoLasketaan = monenkoKeskiarvo;
     }
 
     public double[] laske(double[] uudetArvot) {
-
+        
+        edelliset.add(uudetArvot);
         for (int i = 0; i < uudetArvot.length; i++) {
             edellistenArvojenKeskiarvo[i] += uudetArvot[i] / monenkoKeskiarvoLasketaan;
         }

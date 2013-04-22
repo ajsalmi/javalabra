@@ -20,6 +20,7 @@ public class Main {
         
         Vokaalipeli peli = new Vokaalipeli();
         Kayttoliittyma kayttis = new Kayttoliittyma(peli, 1000, 400);
+        peli.setKayttoliittyma(kayttis);
         kayttis.run();
         while (peli.getStriimi() == null) {
             try {
