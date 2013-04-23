@@ -22,9 +22,6 @@ import vokaalipeli.laskenta.Ikkunafunktio;
 /**
  * Tänne eriytetään ikkuna parametrien kyselyä varten.
  *
- * TODO : parametrien kysely toimimaan
- *
- *
  * @author A J Salmi
  */
 public class ParametrienKyselyIkkuna extends JFrame {
@@ -171,16 +168,15 @@ public class ParametrienKyselyIkkuna extends JFrame {
 
     private static class PlusJaMiinusnapinKuuntelija implements ActionListener {
 
-        int ikkunanPituus;
         JTextField aikaikkunanValintaKentta;
 
         private PlusJaMiinusnapinKuuntelija(JTextField aikaikkunanValintaKentta) {
-            this.ikkunanPituus = Integer.parseInt(aikaikkunanValintaKentta.getText());
             this.aikaikkunanValintaKentta = aikaikkunanValintaKentta;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            int ikkunanPituus = Integer.parseInt(aikaikkunanValintaKentta.getText());
             if (e.getActionCommand().trim().equals("*2")) {
                 ikkunanPituus *= 2;
                 if (ikkunanPituus > 32768) {  // minne asti kannattaa laittaa ehdotuksia?

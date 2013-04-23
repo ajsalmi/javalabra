@@ -11,16 +11,26 @@ import javax.swing.WindowConstants;
  * @author A J Salmi
  */
 public class Paaikkuna extends JFrame {
+    private Taajuuskayra kayra;
 
     public Paaikkuna(Taajuuskayra kayra, int leveys, int korkeus) {
         super("Vokaalipeli");
         setPreferredSize(new Dimension(leveys, korkeus));
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.kayra = kayra;
         luoKomponentit(this.getContentPane(), kayra);
         pack();
         setVisible(true);
     }
 
+    public void asetaArvotTaajuuskayralle(double[] uudetArvot){
+        this.kayra.setArvot(uudetArvot);
+    }
+    
+    public Taajuuskayra getTaajuuskayra(){
+        return this.kayra;
+    }
+    
     /**
      * Metodi täyttää ikkunan halutuilla komponenteilla: taajuuskäyrä
      *

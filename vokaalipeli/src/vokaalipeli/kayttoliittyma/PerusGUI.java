@@ -12,11 +12,10 @@ import vokaalipeli.peli.Vokaalipeli;
  *
  * @author A J Salmi
  */
-public class PerusGUI implements Runnable, Kayttoliittyma {
+public class PerusGUI implements Kayttoliittyma {
 
     private ParametrienKyselyIkkuna ikkuna;
     private Paaikkuna paaikkuna;
-    private Taajuuskayra taajuuskayra;
     private int korkeus;
     private int leveys;
     private Vokaalipeli peli;
@@ -38,7 +37,7 @@ public class PerusGUI implements Runnable, Kayttoliittyma {
     }
 
     public void asetaArvotKayralle(double[]arvot){
-        this.taajuuskayra.setArvot(arvot);
+        this.paaikkuna.asetaArvotTaajuuskayralle(arvot);
     }
 
      /**
@@ -50,7 +49,7 @@ public class PerusGUI implements Runnable, Kayttoliittyma {
      */
     @Override
     public void run() {
-        ikkuna = new ParametrienKyselyIkkuna();
+        this.ikkuna = new ParametrienKyselyIkkuna();
         
         ikkuna.getKaynnistysnappi().addActionListener(new ActionListener() {
             
@@ -69,7 +68,7 @@ public class PerusGUI implements Runnable, Kayttoliittyma {
             boolean bigEndian = ikkuna.getTavujarjestys();                        
             AudioFormat formaatti = new AudioFormat(naytteenottoTaajuus, tavuaPerNayte, 1, signed, bigEndian);
             peli.setAanilahde(new Mikrofoni(formaatti));
-            taajuuskayra = new Taajuuskayra(korkeus - 45, leveys - 20, 60000, naytteenottoTaajuus/2);    
+            Taajuuskayra taajuuskayra = new Taajuuskayra(korkeus - 45, leveys - 20, 60000, naytteenottoTaajuus/2);    
             paaikkuna = new Paaikkuna(taajuuskayra, leveys, korkeus);
             ikkuna.dispose();
             ikkuna = null;

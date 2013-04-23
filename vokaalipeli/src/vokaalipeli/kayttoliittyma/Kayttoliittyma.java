@@ -7,7 +7,10 @@ package vokaalipeli.kayttoliittyma;
  *
  * @author A J Salmi
  */
-public interface Kayttoliittyma {
+public interface Kayttoliittyma extends Runnable{
 
     public void asetaArvotKayralle(double[] arvot);
+
+    @Override
+    public void run();
 }

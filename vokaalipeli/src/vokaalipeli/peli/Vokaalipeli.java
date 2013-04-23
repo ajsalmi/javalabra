@@ -7,7 +7,6 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import vokaalipeli.kayttoliittyma.AaniLahde;
 import vokaalipeli.kayttoliittyma.Kayttoliittyma;
-//import vokaalipeli.kayttoliittyma.Taajuuskayra;
 import vokaalipeli.laskenta.FastFourierMuokkaaja;
 import vokaalipeli.laskenta.Ikkunafunktio;
 import vokaalipeli.laskenta.IkkunafunktionLaskija;
@@ -16,11 +15,12 @@ import vokaalipeli.laskenta.KeskiarvonLaskija;
 /**
  * Luokka sisältää keskeisimmät osat koko ohjelmasta. Se ottaa talteen
  * äänisyötteen AaniLahde-rajapinnan toteuttavan olion AudioInputStreamistä, 
- * lähettää sen muokattavaksi FastFourierMuokkaajalle ja lähettää arvot taajuuskäyrälle. 
- * [vai käyttikselle joka puolestaa lähettää eteenpäin ??]
+ * lähettää sen muokattavaksi FastFourierMuokkaajalle ja lähettää arvot 
+ * käyttikselle.
  *
  * TODO: ...ja pitää myös kirjaa kullakin hetkellä tavoiteltavasta vokaalista
- * TODO: ...ja vastaa myös uuden vokaalin pyytämisestä VokaaliInventoriolta
+ * TODO: ...ja vastaa myös uuden vokaalin pyytämisestä VokaaliInventoriolta ja 
+ *          lähettämisestä käyttikselle
  *
  * @author A J Salmi
  */
