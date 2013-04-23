@@ -148,10 +148,9 @@ public class ParametrienKyselyIkkuna extends JFrame {
         paneeliPlussalleJaMiinukselle.add(miinus);
         container.add(paneeliPlussalleJaMiinukselle);
         container.add(new JLabel(" "));
-        //------------------------------------------
-        JButton kaynnistys = new JButton("Käynnistä");
+        //------------------------------------------ 
+        kaynnistysnappi = new JButton("Käynnistä");
         container.add(new JLabel(" "));
-        kaynnistysnappi = kaynnistys;
         container.add(kaynnistysnappi);
     }
 
