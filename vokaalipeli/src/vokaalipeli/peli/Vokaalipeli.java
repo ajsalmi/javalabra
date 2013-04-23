@@ -7,7 +7,7 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import vokaalipeli.kayttoliittyma.AaniLahde;
 import vokaalipeli.kayttoliittyma.Kayttoliittyma;
-import vokaalipeli.kayttoliittyma.Taajuuskayra;
+//import vokaalipeli.kayttoliittyma.Taajuuskayra;
 import vokaalipeli.laskenta.FastFourierMuokkaaja;
 import vokaalipeli.laskenta.Ikkunafunktio;
 import vokaalipeli.laskenta.IkkunafunktionLaskija;
@@ -32,7 +32,7 @@ public class Vokaalipeli {
     private AaniLahde aanilahde;
     private int aikaikkunanPituus;          // täytyy olla kakkosen potenssi
     private double siirtyma;                // paljonko aikaikkunaa siirretään kerralla
-    private boolean jatkuu;                 // tarvitaanko jos pelistä pääsee vain pois??
+    private boolean jatkuu = true;          // tarvitaanko jos pelistä pääsee vain pois??
     private IkkunafunktionLaskija ikkunaFunktionLaskija;
 
     public void setAanilahde(AaniLahde a) {
@@ -73,7 +73,6 @@ public class Vokaalipeli {
      * @see Taajuuskayra
      */
     public void kaynnista() {
-        this.jatkuu = true;
 
         AudioFormat formaatti = aanilahde.getStriimi().getFormat();
         this.siirtyma = formaatti.getSampleRate() / 180; // jaetaan arvojen saapumistaajuudella
@@ -89,7 +88,6 @@ public class Vokaalipeli {
                 try {
                     Thread.sleep(10);
                 } catch (InterruptedException ex) {
-//                    Logger.getLogger(Vokaalipeli.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
             
@@ -125,10 +123,6 @@ public class Vokaalipeli {
             this.muokkaaja = new FastFourierMuokkaaja(aikaikkunanPituus);
         }
     }
-
-//    public void setFastFourierMuokkaaja(FastFourierMuokkaaja muokkaaja) {
-//        this.muokkaaja = muokkaaja;
-//    }
 
     public void setKayttoliittyma(Kayttoliittyma kayttis) {
         this.kayttis = kayttis;

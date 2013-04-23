@@ -20,9 +20,12 @@ päivä	tuntia		seloste
 9.4.	3		muokkasin Taajuuskayran käyttämään Timer-luokan oliota säännölliseen päivitykseen, ja poistin mukautuvan aikaikkunan koon (=> päivitystaajuuden)
 16.4	5		otin sittenkin pois Timerin; en ole varma onko FFT laskettu oikeinpäin, nimittäin ykkösen ensimmäisen juuren pitäisi olla ensimmäinen vastapäivään (= negatiivinen eksponentti) eikä myötäpäivään...  
 17.4.	6		päivitin luokkakaavion, tein JavaDocit luokille, huomasin että ikkunafunktion laskeminen hidastaa merkittävästi laskemista pienemmillä taajuuksilla, missä voi olla syy nykimiseen.
-18.4. 	5		uusia luokkia: Ikkunafuntio, IkkunafunktionLaskija
+18.4. 	5		uusia: Ikkunafunktio (lueteltu tyyppi) ja IkkunafunktionLaskija (luokka)
 19.4.	5		testejä (Vokaali, VokaaliInventorio), pieniä muutoksia
 20.4.	2 		Taajuuskayralta laskentaa pois --> KeskiarvonLaskijalle, viilausta  
+20.4.	4		???
+22.4.	5		parametrien kysely käyttäjältä toimii, Kayttoliittymasta rajapinta (ainoana toteuttajana PerusGUI); työ hyvinkin esittelykunnossa!
+
 
 
 Lyhenteet:
