@@ -9,7 +9,7 @@ package vokaalipeli.kayttoliittyma;
  */
 public interface Kayttoliittyma extends Runnable{
 
-    public void asetaArvotKayralle(double[] arvot);
+    public void asetaArvot(double[] arvot);
 
     @Override
     public void run();

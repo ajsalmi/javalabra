@@ -41,7 +41,6 @@ public class Mikrofoni implements AaniLahde {
      */
     private void luoInputStream(AudioFormat formaatti) {
         DataLine.Info info = new DataLine.Info(TargetDataLine.class, formaatti);
-        System.out.println(info);
         TargetDataLine linja;
         AudioInputStream stream = null;
         try {

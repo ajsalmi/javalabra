@@ -1,5 +1,6 @@
 package vokaalipeli.kayttoliittyma;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -27,6 +28,7 @@ import vokaalipeli.laskenta.Ikkunafunktio;
 public class ParametrienKyselyIkkuna extends JFrame {
 
     private JButton kaynnistysnappi;
+    private JButton ohjeNappi;
     private JComboBox<String> taajuusvalinta;
     private ButtonGroup bitsPerSampleValinta;
     private JComboBox<Ikkunafunktio> ikkunafunktioValinta;
@@ -58,14 +60,14 @@ public class ParametrienKyselyIkkuna extends JFrame {
         }
         return false;
     }
-    
-    public int getIkkunanKoko(){
+
+    public int getIkkunanKoko() {
         return Integer.parseInt(aikaikkunanValinta.getText().trim());
     }
-    
-    public boolean getTavujarjestys(){
+
+    public boolean getTavujarjestys() {
         AbstractButton valittuNappi = etsiValittuNappi(tavujarjestysValinta);
-        if (valittuNappi.getText().contains("big")) {  
+        if (valittuNappi.getText().contains("big")) {
             return true;
         }
         return false;
@@ -85,7 +87,7 @@ public class ParametrienKyselyIkkuna extends JFrame {
      * @param container
      */
     private void luoKomponentit(Container container) {
-        GridLayout layout = new GridLayout(24, 1);
+        GridLayout layout = new GridLayout(25, 1);
         container.setLayout(layout);
 //----------------------------------------------------------
         container.add(new JLabel(" näytteenottotaajuus"));
@@ -150,10 +152,25 @@ public class ParametrienKyselyIkkuna extends JFrame {
         container.add(new JLabel(" "));
         //------------------------------------------ 
         kaynnistysnappi = new JButton("Käynnistä");
-        container.add(new JLabel(" "));
         container.add(kaynnistysnappi);
+        ohjeNappi = new JButton(" ohje ");
+        container.add(ohjeNappi);
+        ohjeNappi.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new Infoikkuna(Info.PARAMETRIEN_VALINTA, ohjeNappi);
+            }
+        });
+
+
     }
 
+    /**
+     * Etsii valitun napin annetusta nappiryhmästä.
+     * 
+     * @param nappiryhma johonkin valintaan liittyvät vaihtoehdot
+     * @return valittu nappi tai null jos ei mitään valittuna
+     */
     private AbstractButton etsiValittuNappi(ButtonGroup nappiryhma) {
         Enumeration<AbstractButton> napit = nappiryhma.getElements();
         while (napit.hasMoreElements()) {

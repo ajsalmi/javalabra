@@ -57,9 +57,5 @@ public class VokaaliInventorio {
             return null;
         }
         return this.vokaalit.get(indeksi);
-    }
-    
-    // public Vokaali satunnainenVokaali() {}    ???
-    
-    // public Vokaali satunnainenVokaaliPoislukien(Vokaali vokaali) {}  ??? 
+    } 
 }

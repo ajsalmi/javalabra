@@ -14,20 +14,13 @@ import java.util.Queue;
 public class KeskiarvonLaskija {
 
     private double[] edellistenArvojenKeskiarvo;
-    int monenkoKeskiarvoLasketaan = 1;
+    int monenkoKeskiarvoLasketaan = 1; // luodaan keskiarvolla 1 eli ei laske mitään
     private Queue<double[]> edelliset;
 
     public KeskiarvonLaskija(int taulukonPituus) {
         this.edellistenArvojenKeskiarvo = new double[taulukonPituus];
         this.edelliset = new ArrayDeque<>();
     }
-
-//    public KeskiarvonLaskija(int taulukonPituus, int monenkoKeskiarvo) {
-//        this(taulukonPituus);
-//        if (monenkoKeskiarvo > 1) {
-//            this.monenkoKeskiarvoLasketaan = monenkoKeskiarvo;
-//        }
-//    }
     
     public void setLaskettavienKeskiarvojenLkm (int monenkoKeskiarvo){
         this.monenkoKeskiarvoLasketaan = monenkoKeskiarvo;

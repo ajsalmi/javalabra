@@ -29,6 +29,7 @@ public class Main {
             } catch (InterruptedException ex) {
             }
         }
-        peli.kaynnista();        
+//        peli.kaynnista();  
+        peli.run();
     }
 }

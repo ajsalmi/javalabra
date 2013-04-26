@@ -3,8 +3,11 @@ package vokaalipeli.peli;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Queue;
+import java.util.Random;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
+import vokaalipeli.domain.Vokaali;
+import vokaalipeli.domain.VokaaliInventorio;
 import vokaalipeli.kayttoliittyma.AaniLahde;
 import vokaalipeli.kayttoliittyma.Kayttoliittyma;
 import vokaalipeli.laskenta.FastFourierMuokkaaja;
@@ -24,17 +27,28 @@ import vokaalipeli.laskenta.KeskiarvonLaskija;
  *
  * @author A J Salmi
  */
-public class Vokaalipeli {
+public class Vokaalipeli implements Runnable{
 
     private Kayttoliittyma kayttis;
     private FastFourierMuokkaaja muokkaaja;
     private KeskiarvonLaskija keskiarvonLaskija;
+    private VokaaliInventorio kielenVokaalit;
     private AaniLahde aanilahde;
     private int aikaikkunanPituus;          // täytyy olla kakkosen potenssi
-    private double siirtyma;                // paljonko aikaikkunaa siirretään kerralla
+    private double aikaikkunanSiirtyma;     // paljonko aikaikkunaa siirretään kerralla
     private boolean jatkuu = true;          // tarvitaanko jos pelistä pääsee vain pois??
     private IkkunafunktionLaskija ikkunaFunktionLaskija;
 
+    public Vokaalipeli(){
+        this.kielenVokaalit = new VokaaliInventorionLuoja().luoSuomenVokaalit();
+    }
+    
+    public Vokaali annaUusiVokaali(){
+        int vokaalienLkm = kielenVokaalit.getVokaalienMaara();
+        int indeksi = new Random().nextInt(vokaalienLkm);
+        return kielenVokaalit.annaVokaali(indeksi);
+    }
+    
     public void setAanilahde(AaniLahde a) {
         this.aanilahde = a;
     }
@@ -66,16 +80,17 @@ public class Vokaalipeli {
      * jokaiseen käsittelyssä olevaan aikaikkunaan sopivalla korjauksella (esim. 'Hann
      * window function') joka heikentää signaalia ikkunan molemmista päistä. Kun
      * ikkuna on täynnä, lähetetään se FFT-muokkaajalle käsittelyyn saaduista
-     * arvoista (kompleksilukuja!) lasketut amplitudit lähetetään
-     * taajuuskäyrälle päivitykseen.
+     * arvoista (kompleksilukuja!) lasketut amplitudit lähetetään käyttöliittymälle 
+     * päivitykseen.
      *
      * @see FastFourierMuokkaaja
      * @see Taajuuskayra
      */
-    public void kaynnista() {
+//    public void kaynnista() {
+    public void run(){
 
         AudioFormat formaatti = aanilahde.getStriimi().getFormat();
-        this.siirtyma = formaatti.getSampleRate() / 180; // jaetaan arvojen saapumistaajuudella
+        this.aikaikkunanSiirtyma = formaatti.getSampleRate() / 180; // jaetaan arvojen saapumistaajuudella
         int tavuaPerNayte = formaatti.getFrameSize();
         boolean bigEndian = formaatti.isBigEndian();
 
@@ -93,7 +108,7 @@ public class Vokaalipeli {
             
             double luettuArvo = lueArvo(bigEndian, tavuaPerNayte);
 
-            if (laskuri >= siirtyma) {
+            if (laskuri >= aikaikkunanSiirtyma) {
                 luoUusiAikaikkuna(kasiteltavat);
                 laskuri = 0;
             }
@@ -106,7 +121,7 @@ public class Vokaalipeli {
                     ikkuna = muokkaaja.muokkaaFFT(ikkuna, true);
                     double[] valmiitArvot = laskeAmplitudit(ikkuna);
                     valmiitArvot = keskiarvonLaskija.laske(valmiitArvot);
-                    kayttis.asetaArvotKayralle(valmiitArvot);
+                    kayttis.asetaArvot(valmiitArvot);
                     kasiteltavat.poll();
                 }
                 ikkuna[0][indeksi] = luettuArvo * ikkunaFunktionLaskija.annaKerroin(indeksi);
@@ -148,8 +163,6 @@ public class Vokaalipeli {
     /**
      * Metodi laskee amplitudit kaikille taulukon arvoille reaaliosan ja
      * imaginaariosan euklidisena normina: (re^2 + im^2)^(0.5)
-     *
-     * laskentaa? siis pakkaukseen "laskenta"?
      * 
      * @param analysoitava analysoitava (reaali- ja imag-) taulukko
      * @return eri taajuuksien amplitudit
