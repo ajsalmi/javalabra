@@ -2,8 +2,6 @@ package vokaalipeli.kayttoliittyma;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sound.sampled.AudioFormat;
 import javax.swing.JButton;
 import vokaalipeli.laskenta.Ikkunafunktio;
@@ -11,9 +9,7 @@ import vokaalipeli.peli.Vokaalipeli;
 
 /**
  * Luokka koordinoi Taajuuskäyrä-olion luomista, parametrien kysymistä
- * käyttäjältä ja niiden antamista Vokaalipeli-luokan oliolle. Tämä on ainoa
- * luokka joka kommunikoi Vokaalipeli-luokan ilmentymän kanssa, rajapinnan
- * kautta.
+ * käyttäjältä ja niiden antamista Vokaalipeli-luokan oliolle.
  *
  * @author A J Salmi
  * @see Vokaalipeli
@@ -63,10 +59,10 @@ public class PerusGUI implements Kayttoliittyma {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int ikkunanKoko = kyselyIkkuna.getIkkunanKoko();
-                peli.setAikaikkunanKoko(ikkunanKoko);
+                peli.asetaAikaikkunanKoko(ikkunanKoko);
 
                 Ikkunafunktio funktio = kyselyIkkuna.getIkkunafunktio();
-                peli.setIkkunafunktio(funktio);
+                peli.asetaIkkunafunktio(funktio);
 
                 int naytteenottoTaajuus = kyselyIkkuna.getNaytteenottoTaajuus();
                 int tavuaPerNayte = kyselyIkkuna.getTavuaPerNayte();
@@ -78,6 +74,7 @@ public class PerusGUI implements Kayttoliittyma {
                     peli.setAanilahde(new Mikrofoni(formaatti));
                     Taajuuskayra taajuuskayra = new Taajuuskayra(korkeus - 70, leveys - 20, 60000, naytteenottoTaajuus / 2);
                     paaikkuna = new Paaikkuna(taajuuskayra, leveys, korkeus);
+//                    paaikkuna.addKeyListener(new NappaimistonKuuntelija(paaikkuna));
                     asetaKuuntelijat();
                     kyselyIkkuna.dispose();
                     kyselyIkkuna = null;
@@ -96,7 +93,10 @@ public class PerusGUI implements Kayttoliittyma {
                 paaikkuna.asetaVokaali(peli.annaUusiVokaali());
             }
         });
-        
-        
+    }
+
+    @Override
+    public boolean arvojenAsettaminenValmis() {
+        return this.paaikkuna.getTaajuuskayra().getPiirtoValmiina();
     }
 }

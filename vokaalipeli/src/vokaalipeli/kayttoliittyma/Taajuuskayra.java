@@ -14,12 +14,14 @@ import vokaalipeli.domain.Vokaali;
 public class Taajuuskayra extends JPanel {
 
     private Vokaali verrattavaVokaali;
+    private double vokaalinKorjauskerroin = 1;
     private int korkeus;
     private int leveys;
     private double[] arvot;
-    private double maxArvoAmplitudi;
+    private double maxArvo;
     private double[] suhteellisetTaajuudet;   // eka on 0 ja viimeinen on 1 
     private int maxTaajuus;
+    private boolean piirtoValmiina;
 
     /**
      * Konstruktori.
@@ -32,12 +34,25 @@ public class Taajuuskayra extends JPanel {
         super.setBackground(Color.DARK_GRAY);
         this.korkeus = korkeus;
         this.leveys = leveys;
-        this.maxArvoAmplitudi = maxAmplitudi;
+        this.piirtoValmiina = true;
+        this.maxArvo = maxAmplitudi;
         this.maxTaajuus = suurinEsitettavaTaajuus;
+    }
+
+    public void kasvataKerrointa() {
+        this.vokaalinKorjauskerroin *= 1.001;
+    }
+
+    public void pienennaKerrointa() {
+        this.vokaalinKorjauskerroin *= 0.999;
     }
 
     public void setVokaali(Vokaali verrattava) {
         this.verrattavaVokaali = verrattava;
+    }
+
+    public boolean getPiirtoValmiina() {
+        return this.piirtoValmiina;
     }
 
     /**
@@ -46,7 +61,7 @@ public class Taajuuskayra extends JPanel {
      * @param uudetArvot taajuuskäyrälle syötetyt uudet arvot
      */
     public void setArvot(double[] uudetArvot) {
-
+        this.piirtoValmiina = false;
         if (this.suhteellisetTaajuudet == null) {
             luoTasavalisetTaajuudet(uudetArvot.length);
         }
@@ -60,7 +75,7 @@ public class Taajuuskayra extends JPanel {
      * eivät mahdu visualisointiin varattuun tilaan.
      */
     public void kasvataMaxArvoa() {
-        this.maxArvoAmplitudi = 1.8 * maxArvoAmplitudi;
+        this.maxArvo = 1.8 * maxArvo;
     }
 
     /**
@@ -68,7 +83,7 @@ public class Taajuuskayra extends JPanel {
      * liian pienenä.
      */
     public void pienennaMaxArvoa() {
-        this.maxArvoAmplitudi = 0.6 * maxArvoAmplitudi;
+        this.maxArvo = 0.6 * maxArvo;
     }
 
     @Override
@@ -92,6 +107,8 @@ public class Taajuuskayra extends JPanel {
 
         g.setColor(Color.GRAY);
         g.draw3DRect(2, 2, leveys, korkeus, true);
+        
+        this.piirtoValmiina = true;
     }
 
     /**
@@ -114,9 +131,9 @@ public class Taajuuskayra extends JPanel {
 
         for (int j = 0; j < viivanPaksuus; j++) {
             alkuX = (int) (leveys * suhteellisetTaajuudet[i]) + j;
-            alkuY = (int) (korkeus * (1 - arvot[i] / maxArvoAmplitudi));
+            alkuY = (int) (korkeus * (1 - arvot[i] / maxArvo));
             loppuX = (int) (leveys * suhteellisetTaajuudet[i + 1]) + j;
-            loppuY = (int) (korkeus * (1 - arvot[i + 1] / maxArvoAmplitudi));
+            loppuY = (int) (korkeus * (1 - arvot[i + 1] / maxArvo));
             grafiikka.drawLine(alkuX, alkuY, loppuX, loppuY);
         }
     }
@@ -141,21 +158,20 @@ public class Taajuuskayra extends JPanel {
      *
      */
     private void piirraVokaalinFormantitJaNimi(Graphics g) {
-
-        g.setColor(Color.BLACK);
-        g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
-        g.drawString(verrattavaVokaali.getNimi(), (int) (leveys * 0.9), (int) (korkeus * 0.3));
-
         g.setColor(Color.YELLOW);
         int kaistaleenLeveys = 700_000 / maxTaajuus;
         for (int taajuus : verrattavaVokaali.getFormantit()) {
-            g.fillRect((int) (leveys * taajuus / maxTaajuus) - kaistaleenLeveys / 2, 2, kaistaleenLeveys, korkeus - 2);
+            g.fillRect((int) (vokaalinKorjauskerroin*leveys * taajuus / maxTaajuus) - kaistaleenLeveys / 2, 2, kaistaleenLeveys, korkeus - 2);
         }
 
         g.setColor(Color.ORANGE);
         kaistaleenLeveys = 200_000 / maxTaajuus;
         for (int taajuus : verrattavaVokaali.getFormantit()) {
-            g.fillRect((int) (leveys * taajuus / maxTaajuus) - kaistaleenLeveys / 2, 2, kaistaleenLeveys, korkeus - 2);
+            g.fillRect((int) (vokaalinKorjauskerroin*leveys * taajuus / maxTaajuus) - kaistaleenLeveys / 2, 2, kaistaleenLeveys, korkeus - 2);
         }
+        
+        g.setColor(Color.BLACK);
+        g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
+        g.drawString(verrattavaVokaali.getNimi(), (int) (leveys * 0.9), (int) (korkeus * 0.3));
     }
 }

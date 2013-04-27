@@ -73,7 +73,7 @@ public class Infoikkuna extends JFrame {
 
         if (this.info == Info.PAAIKKUNAN_KAYTTO) {
             ohjeTekstialue.append(
-                    "\n  Kieli on oletusarvoisesti suomi. \n\n"
+                    "\n  Kieli on oletusarvoisesti suomi, eli ne ovat kaikki suomen kielestä. \n\n"
                     + "  Tutustu ensin käyrään, tarkastele miten se esittää äänisignaalin ja \n"
                     + "  miten eri vokaalit piirtyvät käyrälle. Ääntöväylän pituus vaihtelee \n"
                     + "  eri puhujien välillä anatomisista syistä johtuen ja siksi täsmälleen \n"
@@ -81,26 +81,30 @@ public class Infoikkuna extends JFrame {
                     + "  Selkeimmin tämä näkyy äänteen taajuuspiikkien (ns. formanttitaajuuksien)\n"
                     + "  siirtymisenä joko oikealle tai vasemmalle, kuitenkin niiden keskinäisen \n"
                     + "  suhteen pysyessä samana. Voit käyttää nuolinäppäimiä (oikea ja vasen) \n"
-                    + "  säätämään vokaalien formantteja varten piirrettyjä keltaisia kaistaleita.\n\n\n "
-                    + "  Alapaneelin napeilla voit vaikuttaa käyrän korkeuteen ja pyytää uuden vokaalin. \n"
-                    + "  ... \n"
-                    + "  ... kielen, kun olet valmis siirtymään suomen kielestä vieraan kielen vokaleihin. \n");
+                    + "  säätämään vokaalien formanteille piirrettyjä keltaisia kaistaleita. \n\n"
+                    + "  Alapaneelin napeilla voit vaikuttaa käyrän korkeuteen ja pyytää uuden \n"
+                    + "  vokaalin. Kun olet tutustunut tarpeeksi hyvin taajuuskäyrän toimintaan, \n"
+                    + "  löytänyt selkeimmin vokaalit näyttävät parametrit ja säätänyt formantti- \n"
+                    + "  tajuudet oikealle kohdalleen, voit valita jonkin muun kielen. \n"
+                    + "  (tämä toiminto toteutetaan tulevaisuudessa)\n\n"
+                    + "  Jos käyrällä ei näy mitään, tarkista että mikrofoni on kytkettynä ja että \n"
+                    + "  se ei ole mykistettynä ääniasetuksissa.\n");
         } else if (this.info == Info.PARAMETRIEN_VALINTA) {
             ohjeTekstialue.append(
                     "\n  Kokeile käynnistää vokaalipeliä eri parametreilla. Aluksi on ääniformaatin \n"
                     + "  ominaisuudet. Näytteenottotaajuus ('sample rate') kertoo kuinka monta kertaa \n"
-                    + "  sekunnissa syötteestä otetaan näyte. Näytteen koko bitteinä ('bits per sample') \n"
+                    + "  sekunnissa syötteestä otetaan näyte. Näytteen koko bitteinä ('bits/sample') \n"
                     + "  kertoo digitaalisen signaalin resoluution. Etumerkillisyys kertoo sen onko \n"
                     + "  näytteissä vain positiivisia arvoja vai myös negatiivisia. Tavujärjestyksellä \n"
-                    + "  puolestaan tarkoitetaan sitä missä järjestyksessä tavut esitetään formaatissa. \n"
-                    + "  Näillä kahdella viimeisellä arvolla ei ole käytännössä merkitystä itse pelin \n"
-                    + "  tai taajuuskäyrän esittämisen kannalta.\n\n\n"
+                    + "  puolestaan tarkoitetaan sitä missä järjestyksessä tavut esitetään. Nämä kaksi \n"
+                    + "  viimeistä parametria eivät käytännössä vaikuta itse peliin tai taajuuskäyrän \n"
+                    + "  esitykseen. \n\n\n"
                     + "  Seuraavaksi on ikkunafunktion valinta, joka määrittää miten äänisyötettä \n"
                     + "  käsitellään. Oletusarvona on Hann-funktio, mutta voit myös kokeilla miten \n"
                     + "  muut ikkunafunktiot vaikuttavat käyrän esitykseen. Aikaikkuna määrittää sen \n"
-                    + "  kuinka pitkä pätkä äänisyötettä analysoidaan kerralla. Pidemmällä aikaikkunalla\n"
-                    + "  taajuudet erottuvat tarkemmin mutta käyrän viive on suurempi, koska pidemmän \n"
-                    + "  aikaikkunan täyttäminen yksittäisillä syötteillä kestää pidempään.");
+                    + "  kuinka pitkä pätkä äänisyötettä otetaan analysoitavaksi kerralla. Pidemmällä \n"
+                    + "  aikaikkunalla taajuudet erottuvat paremmin mutta käyrän viive on suurempi, \n"
+                    + "  koska pidemmän aikaikkunan täyttäminen yksittäisillä näytteillä kestää enemmän.\n");
         } else if (this.info == Info.EI_TUETTU_FORMAATTI) {
             ohjeTekstialue.append(
                     "\n  Antamaasi formaattia ei tueta. Kokeile jotain muuta. \n");

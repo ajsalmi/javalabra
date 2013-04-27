@@ -22,10 +22,10 @@ public class FastFourierMuokkaaja {
         this.jarjestysTaulukko = luoOikeaJarjestys(taulukonPituus);
     }
 
-    public int[] getJarjestys() { // onko tarpeellinen ? 
+    public int[] getJarjestys(){
         return this.jarjestysTaulukko;
     }
-
+    
     /**
     * Metodi laskee FFT:n käyttäen apuna toista samannimistä metodia.
     * 

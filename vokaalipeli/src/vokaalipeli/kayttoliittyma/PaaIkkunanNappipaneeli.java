@@ -3,6 +3,8 @@ package vokaalipeli.kayttoliittyma;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -48,12 +50,28 @@ public class PaaIkkunanNappipaneeli extends JPanel {
 //        add(new JTextField(" "));
         // vaihda kieli 
         // 
-        add(new JLabel(" "));
-        add(new JLabel(" "));
+//        add(new JLabel(" "));
+//        add(new JLabel(" "));
         add(new JLabel(" "));
         add(new JLabel(" "));
         
-        
+        this.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        });
         
         
         ohjeNappi = new JButton(" ? ");

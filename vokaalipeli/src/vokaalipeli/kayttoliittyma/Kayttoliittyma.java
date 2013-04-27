@@ -10,6 +10,8 @@ package vokaalipeli.kayttoliittyma;
 public interface Kayttoliittyma extends Runnable{
 
     public void asetaArvot(double[] arvot);
+    
+    public boolean arvojenAsettaminenValmis();
 
     @Override
     public void run();

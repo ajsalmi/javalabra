@@ -12,135 +12,139 @@ import vokaalipeli.kayttoliittyma.AaniLahde;
 import vokaalipeli.kayttoliittyma.Kayttoliittyma;
 import vokaalipeli.laskenta.FastFourierMuokkaaja;
 import vokaalipeli.laskenta.Ikkunafunktio;
-import vokaalipeli.laskenta.IkkunafunktionLaskija;
-import vokaalipeli.laskenta.KeskiarvonLaskija;
+import vokaalipeli.laskenta.LaskentaKeskus;
 
 /**
- * Luokka sisältää keskeisimmät osat koko ohjelmasta. Se ottaa talteen
- * äänisyötteen AaniLahde-rajapinnan toteuttavan olion AudioInputStreamistä, 
- * lähettää sen muokattavaksi FastFourierMuokkaajalle ja lähettää arvot 
- * käyttikselle.
- *
- * TODO: ...ja pitää myös kirjaa kullakin hetkellä tavoiteltavasta vokaalista
- * TODO: ...ja vastaa myös uuden vokaalin pyytämisestä VokaaliInventoriolta ja 
- *          lähettämisestä käyttikselle
- *
+ * Luokka 
+ * 
  * @author A J Salmi
  */
-public class Vokaalipeli implements Runnable{
+public class Vokaalipeli implements Runnable {
 
-    private Kayttoliittyma kayttis;
-    private FastFourierMuokkaaja muokkaaja;
-    private KeskiarvonLaskija keskiarvonLaskija;
+    private Kayttoliittyma kayttoliittyma;
     private VokaaliInventorio kielenVokaalit;
+    private Vokaali edellinenVokaali;
+    private double formanttienKorjauskerroin = 1.0; // nimeä paremmin
     private AaniLahde aanilahde;
-    private int aikaikkunanPituus;          // täytyy olla kakkosen potenssi
-    private double aikaikkunanSiirtyma;     // paljonko aikaikkunaa siirretään kerralla
-    private boolean jatkuu = true;          // tarvitaanko jos pelistä pääsee vain pois??
-    private IkkunafunktionLaskija ikkunaFunktionLaskija;
+    private LaskentaKeskus laskentakeskus;
 
-    public Vokaalipeli(){
+    public Vokaalipeli() {
         this.kielenVokaalit = new VokaaliInventorionLuoja().luoSuomenVokaalit();
     }
-    
-    public Vokaali annaUusiVokaali(){
+
+    /**
+     * Metodi palauttaa vokaali-inventoriosta vokaalin. Se ei saa olla sama kuin
+     * edellinen vokaali.
+     * 
+     * @return uusi vokaali
+     */
+    public Vokaali annaUusiVokaali() {
         int vokaalienLkm = kielenVokaalit.getVokaalienMaara();
-        int indeksi = new Random().nextInt(vokaalienLkm);
-        return kielenVokaalit.annaVokaali(indeksi);
+        Random arpoja = new Random();
+        Vokaali uusiVokaali = kielenVokaalit.annaVokaali(arpoja.nextInt(vokaalienLkm));
+        while (edellinenVokaali == uusiVokaali) {
+            uusiVokaali = kielenVokaalit.annaVokaali(arpoja.nextInt(vokaalienLkm));
+        }
+        this.edellinenVokaali = uusiVokaali;
+//        uusiVokaali = teeKorjaus(uusiVokaali);
+        return uusiVokaali;
     }
-    
+
+    /**
+     * Metodi ...
+     * 
+     * @param kerroin
+     * @return 
+     */
+    public Vokaali annaUusiVokaali(double kerroin){
+        this.formanttienKorjauskerroin = kerroin;
+        return annaUusiVokaali();
+    }
+
     public void setAanilahde(AaniLahde a) {
         this.aanilahde = a;
     }
 
+    public void asetaAikaikkunanKoko(int ikkunanKoko) {
+        if (onKakkosenPotenssi(ikkunanKoko)) {
+            this.laskentakeskus = new LaskentaKeskus(ikkunanKoko);
+        }
+    }
+
+    public void setKayttoliittyma(Kayttoliittyma kayttis) {
+        this.kayttoliittyma = kayttis;
+    }
+
+    
     public AudioInputStream getStriimi() {
-        if (this.aanilahde == null) return null;        
+        if (this.aanilahde == null) {
+            return null;
+        }
         return this.aanilahde.getStriimi();
     }
 
-    public void setIkkunafunktio(Ikkunafunktio funktio) {
-        this.ikkunaFunktionLaskija = new IkkunafunktionLaskija(aikaikkunanPituus, funktio);
-    }
-
-    /**
-     * Pysäyttää pelin.
-     */
-    public void pysayta() {
-        this.jatkuu = false;
-    }
-    
-    public void jatka(){
-        this.jatkuu = true;
+    public void asetaIkkunafunktio(Ikkunafunktio funktio) {
+        this.laskentakeskus.setIkkunaFunktio(funktio);
     }
 
     /**
      * Metodi käynnistää pelin ensin luomalla uuden ArrayListin käsiteltäville
      * aikaikkunoille, siirtyy whle-looppiin ja pysyy niin kauan kunnes peli
      * pysäytetään. Loopin sisällä luetaan arvoja InputStreamistä, laitetaan ne
-     * jokaiseen käsittelyssä olevaan aikaikkunaan sopivalla korjauksella (esim. 'Hann
-     * window function') joka heikentää signaalia ikkunan molemmista päistä. Kun
-     * ikkuna on täynnä, lähetetään se FFT-muokkaajalle käsittelyyn saaduista
-     * arvoista (kompleksilukuja!) lasketut amplitudit lähetetään käyttöliittymälle 
-     * päivitykseen.
+     * jokaiseen käsittelyssä olevaan aikaikkunaan sopivalla korjauksella (esim.
+     * 'Hann window function') joka heikentää signaalia ikkunan molemmista
+     * päistä. Kun ikkuna on täynnä, lähetetään se FFT-muokkaajalle käsittelyyn
+     * saaduista arvoista (kompleksilukuja!) lasketut amplitudit lähetetään
+     * käyttöliittymälle päivitykseen.
      *
      * @see FastFourierMuokkaaja
      * @see Taajuuskayra
      */
-//    public void kaynnista() {
-    public void run(){
 
+    @Override
+    public void run() {
         AudioFormat formaatti = aanilahde.getStriimi().getFormat();
-        this.aikaikkunanSiirtyma = formaatti.getSampleRate() / 180; // jaetaan arvojen saapumistaajuudella
+        int aikaikkunanSiirtyma = (int) formaatti.getSampleRate() / 300; // 
         int tavuaPerNayte = formaatti.getFrameSize();
         boolean bigEndian = formaatti.isBigEndian();
 
-        int laskuri = 0;
+        int naytteitaKasitelty = 0;
+        int aikaikkunanPituus = this.laskentakeskus.getAikaikkunanPituus();
         Queue<double[][]> kasiteltavat = new ArrayDeque<>();
-        
-        while (true) {  // ikuinen looppi !
-            
-            while(!this.jatkuu){
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException ex) {
-                }
-            }
-            
+
+        while (true) {  // ikuinen looppi !            
+
             double luettuArvo = lueArvo(bigEndian, tavuaPerNayte);
 
-            if (laskuri >= aikaikkunanSiirtyma) {
-                luoUusiAikaikkuna(kasiteltavat);
-                laskuri = 0;
+            if (naytteitaKasitelty == aikaikkunanSiirtyma) {
+                luoUusiAikaikkuna(kasiteltavat, aikaikkunanPituus);
+                naytteitaKasitelty = 0;
             }
 
             for (double[][] ikkuna : kasiteltavat) {
                 int indeksi = (int) ikkuna[1][0];
 
-                if (indeksi == aikaikkunanPituus - 1) {
-                    ikkuna[1] = new double[aikaikkunanPituus];
-                    ikkuna = muokkaaja.muokkaaFFT(ikkuna, true);
-                    double[] valmiitArvot = laskeAmplitudit(ikkuna);
-                    valmiitArvot = keskiarvonLaskija.laske(valmiitArvot);
-                    kayttis.asetaArvot(valmiitArvot);
+                if (indeksi == aikaikkunanPituus - 1) { //  eli yksi aikaikkuna tuli täyteen
+                    boolean jouduttiinOdottamaan = false;
+                    while (!kayttoliittyma.arvojenAsettaminenValmis()) {
+                        try {
+                            jouduttiinOdottamaan = true;
+                            Thread.sleep(0, 1);
+                        } catch (InterruptedException ex) {
+                        }
+                    }
+
+                    if (!jouduttiinOdottamaan){
+                        double[] valmiitArvot = laskentakeskus.kasittele(ikkuna);
+                        kayttoliittyma.asetaArvot(valmiitArvot);
+                    }
                     kasiteltavat.poll();
                 }
-                ikkuna[0][indeksi] = luettuArvo * ikkunaFunktionLaskija.annaKerroin(indeksi);
+                ikkuna[0][indeksi] = luettuArvo * laskentakeskus.annaIkkunakerroin(indeksi);
                 ikkuna[1][0] = indeksi + 1; // talletetaan indeksi käyttämättömään imaginaariosataulukkoon
             }
-            laskuri++;
+            naytteitaKasitelty++;
         }
-    }
-
-    public void setAikaikkunanKoko(int ikkunanKoko) {
-        if (onKakkosenPotenssi(ikkunanKoko)) {
-            this.aikaikkunanPituus = ikkunanKoko;
-            this.keskiarvonLaskija = new KeskiarvonLaskija(ikkunanKoko/2); // luodaan keskiarvolla 1
-            this.muokkaaja = new FastFourierMuokkaaja(aikaikkunanPituus);
-        }
-    }
-
-    public void setKayttoliittyma(Kayttoliittyma kayttis) {
-        this.kayttis = kayttis;
     }
 
     /**
@@ -161,31 +165,12 @@ public class Vokaalipeli implements Runnable{
     }
 
     /**
-     * Metodi laskee amplitudit kaikille taulukon arvoille reaaliosan ja
-     * imaginaariosan euklidisena normina: (re^2 + im^2)^(0.5)
-     * 
-     * @param analysoitava analysoitava (reaali- ja imag-) taulukko
-     * @return eri taajuuksien amplitudit
-     */
-    private double[] laskeAmplitudit(double[][] analysoitava) {
-        double[] amplitudit = new double[analysoitava[0].length / 2];
-        double a;
-        for (int i = 0; i < amplitudit.length; i++) {
-            a = analysoitava[0][i + 1] * analysoitava[0][i + 1]
-                    + analysoitava[1][i + 1] * analysoitava[1][i + 1];
-            amplitudit[i] = Math.sqrt(a);
-        }
-        return amplitudit;
-    }
-
-
-    /**
-     * Metodi lukee striimistä seuraavan arvon, mitä ennen sen pitää
-     * mahdollisesti käsitellä sitä riippuen äänisyötteen formaatista.
+     * Metodi lukee striimistä seuraavan arvon, mikä saattaa vaatia käsittelyä 
+     * riippuen äänisyötteen formaatista.
      *
-     * @param bigEndian arvojen esitysjärjestys 'big-endian' vai 'little-endian'
-     * @param tavuaPerNayte tavujen määrä syötteessä: 1 (= 8-bittinen) tai 2 (=
-     * 16-bittinen)
+     * @param bigEndian arvojen esitysjärjestys: 'big-endian' vai 'little-endian'
+     * @param tavuaPerNayte tavujen määrä syötteessä: 1 (= 8-bittinen) tai 2 
+     * (= 16-bittinen)
      * @return seuraava luettu arvo striimistä
      */
     private double lueArvo(boolean bigEndian, int tavuaPerNayte) {
@@ -211,14 +196,23 @@ public class Vokaalipeli implements Runnable{
      * Luo uuden tyhjän aikaikkunan ja laittaa sen käsiteltävien aikaikkunoiden
      * jonoon. Koska syötteen arvot ovat reaalilukuja, ei imaaginaariosille
      * tarkoitettua osaa tarvita vielä. Sen tilalle talletetaan yhden mittainen
-     * taulukko, johon laitetaan tieto siitä mihin indeksiin asti taulukkoa on 
+     * taulukko, johon laitetaan tieto siitä mihin indeksiin asti taulukkoa on
      * täytetty.
      *
      * @param kasiteltavatAikaikkunat käsiteltävien aikaikkunoiden jono
-     */   
-    private void luoUusiAikaikkuna(Queue<double[][]> kasiteltavatAikaikkunat) {
+     */
+    private void luoUusiAikaikkuna(Queue<double[][]> kasiteltavatAikaikkunat, int aikaikkunanPituus) {
         double[][] lisattava = new double[2][1];
         lisattava[0] = new double[aikaikkunanPituus];
         kasiteltavatAikaikkunat.add(lisattava);
+    }
+
+    private Vokaali teeKorjaus(Vokaali uusiVokaali) {
+        int[] vokaalinFormantit = uusiVokaali.getFormantit();
+        int[] korjatutFormantit = new int[3];
+        for (int i = 0; i < 3; i++) {
+            korjatutFormantit[i] = (int) (vokaalinFormantit[i]*formanttienKorjauskerroin);
+        }
+        return new Vokaali(uusiVokaali.getNimi(), korjatutFormantit[0], korjatutFormantit[1], korjatutFormantit[2]);
     }
 }

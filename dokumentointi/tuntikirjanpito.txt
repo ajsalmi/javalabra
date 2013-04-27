@@ -25,6 +25,10 @@ päivä	tuntia		seloste
 20.4.	2 		Taajuuskayralta laskentaa pois --> KeskiarvonLaskijalle, viilausta  
 20.4.	4		???
 22.4.	5		parametrien kysely käyttäjältä toimii, Kayttoliittymasta rajapinta (ainoana toteuttajana PerusGUI); työ hyvinkin esittelykunnossa!
+25.4.	4		käyttöliittymän alapaneelin napit toimii
+26.4.	2		kokeiluja yliopiston koneilla
+27.4.	5		formanttien siirtely toimii yms.
+
 
 
 
