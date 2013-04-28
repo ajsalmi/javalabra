@@ -77,14 +77,11 @@ public class FastFourierMuokkaaja {
 
         for (int kierros = 1; kierros <= (int) pituudenLog; kierros++) {
             
-            /**
-             * monenko luvun yli hypätään, ettei yhdellä kierroksella käsiteltäisi samaa lukua kahdesti.
-             */            
+
+            // monenko luvun yli hypätään, ettei yhdellä kierroksella käsiteltäisi samaa lukua kahdesti.            
             int hyppy = (int) Math.pow(2, kierros - 1);
 
-            /**
-             * Ykkösen ensimmäisen kompleksijuuren eksponentti. 
-             */
+            //Ykkösen ensimmäisen kompleksijuuren eksponentti. 
             double ensimmaisenJuurenEksponentti = PII / hyppy; // oikeasti juuri on muotoa: e^(2*PII/(2*hyppy))
             
             for (int k = 0; k < hyppy; k++) {

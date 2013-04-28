@@ -9,16 +9,12 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
-import vokaalipeli.domain.Vokaali;
 
 /**
  * Tässä JFramen perivässä ikkunaluokassa on Taajuuskayra-luokan olio,
- * jolle lähetetään arvot piirrettäviksi, ja käyttäjälle näkyvä 
- * nappipaneeli, jonka kautta käyttäjä voi 
- * [bla bla bla ] <-------------------------- !!
+ * jolle lähetetään arvot piirrettäviksi, ja nappipaneeli.
  * 
  * @author A J Salmi
  */
@@ -32,35 +28,10 @@ public class Paaikkuna extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.taajuuskayra = kayra;
         this.nappipaneeli = new PaaIkkunanNappipaneeli();
-        asetaNappienKuuntelijat();
-        luoKomponentit(this.getContentPane());
-        
-        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-        manager.addKeyEventDispatcher(new KeyEventDispatcher() {
-            @Override
-            public boolean dispatchKeyEvent(KeyEvent e) {
-                if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyCode() == KeyEvent.VK_LEFT){
-                    taajuuskayra.pienennaKerrointa();
-                    return true;
-                }                
-                if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyCode() == KeyEvent.VK_RIGHT){
-                    taajuuskayra.kasvataKerrointa();
-                    return true;
-                }                
-                return false;
-            }
-        });
-        
+        asetaKuuntelijatJaKasittelijat();
+        luoKomponentit(this.getContentPane());                
         pack();
         setVisible(true);
-    }
-
-    public void asetaVokaali(Vokaali vokaali){
-        this.taajuuskayra.setVokaali(vokaali);
-    }
-    
-    public void asetaArvotTaajuuskayralle(double[] uudetArvot){
-        this.taajuuskayra.setArvot(uudetArvot);
     }
     
     public Taajuuskayra getTaajuuskayra(){
@@ -73,15 +44,8 @@ public class Paaikkuna extends JFrame {
     
     /**
      * Metodi täyttää ikkunan halutuilla komponenteilla: taajuuskäyrä,
-     *
-     * TODO: ... ja siihen liittyvät säätönapit:
-     *          * MaxArvo +/-    (--> Taajuuskäyrälle)  
-     *          * keskiarvot     (--> GUI --> Vokaalipeli --> KeskiArvonLaskija)
-     *          * ääntöväylän pituudesta johtuvan formanttien siirtymän korjauskerroin:
-     *          muutetaanko Vokaaleja vai visualisointia vai onko Vokaalipelissä jokin
-     *          double-muuttuja tälle?
      * 
-     * TODO: ... ja vokaalin pyytämistä varten myös nappi 
+     * TODO: ... ja vokaalin pyytämistä varten nappi 
      *          --> pyyntö GUI:lle --> Vokaalipelille --> VokaaliInventorio
      *             Taajuuskayra <--  GUI <-- Vokaalipelille uusi Vokaali <--
      * 
@@ -92,10 +56,9 @@ public class Paaikkuna extends JFrame {
     private void luoKomponentit(Container container) {
         container.add((Component) this.taajuuskayra);
         container.add(nappipaneeli, BorderLayout.SOUTH);        
-
     }
 
-    private void asetaNappienKuuntelijat() {
+    private void asetaKuuntelijatJaKasittelijat() {
         nappipaneeli.getLaskemisNappi().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -109,5 +72,21 @@ public class Paaikkuna extends JFrame {
                 taajuuskayra.pienennaMaxArvoa();
             }
         });        
+        
+        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        manager.addKeyEventDispatcher(new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyCode() == KeyEvent.VK_LEFT){
+                    taajuuskayra.pienennaKorjausKerrointa();
+                    return true;
+                }                
+                if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyCode() == KeyEvent.VK_RIGHT){
+                    taajuuskayra.kasvataKorjausKerrointa();
+                    return true;
+                }                
+                return false;
+            }
+        });    
     }
 }

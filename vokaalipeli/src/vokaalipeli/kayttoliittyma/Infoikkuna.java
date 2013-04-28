@@ -11,7 +11,7 @@ import javax.swing.JTextArea;
 import javax.swing.WindowConstants;
 
 /**
- * Tämä luokka on nimensämukaisesti ikkina joka antaa informaatiota käyttäjälle.
+ * Tämä luokka on nimensä mukaisesti ikkuna, jolla esitetään informaatiota käyttäjälle.
  *
  * @author A J Salmi
  */
@@ -46,9 +46,10 @@ public class Infoikkuna extends JFrame {
      *
      * @param container
      */
-    private void luoKomponentit(Container container) {
-        JButton okNappi = new JButton("OK");
+    private void luoKomponentit(Container container) {        
         container.add(luoOhjeet());
+        
+        JButton okNappi = new JButton("OK");
         container.add(okNappi, BorderLayout.SOUTH);
         okNappi.addActionListener(new ActionListener() {
             @Override
@@ -61,7 +62,7 @@ public class Infoikkuna extends JFrame {
 
     /**
      * Metodi luo tekstialueen (JTextArea) johon asettaa oikean tekstin. Kytkee
-     * napin pois päältä ettei infoikkunoita voisi luoda aina lisää.
+     * napin pois päältä, ettei infoikkunoita voisi luoda aina lisää.
      *
      * @return ohjeet
      */
@@ -73,7 +74,8 @@ public class Infoikkuna extends JFrame {
 
         if (this.info == Info.PAAIKKUNAN_KAYTTO) {
             ohjeTekstialue.append(
-                    "\n  Kieli on oletusarvoisesti suomi, eli ne ovat kaikki suomen kielestä. \n\n"
+                    "\n  Kieli on oletusarvoisesti suomi, eli kaikki arvotut vokaalit ovat \n"
+                    + "  suomen kielestä, jos et ole vaihtanut kieltä joksikin toiseksi. \n\n"
                     + "  Tutustu ensin käyrään, tarkastele miten se esittää äänisignaalin ja \n"
                     + "  miten eri vokaalit piirtyvät käyrälle. Ääntöväylän pituus vaihtelee \n"
                     + "  eri puhujien välillä anatomisista syistä johtuen ja siksi täsmälleen \n"
@@ -85,10 +87,10 @@ public class Infoikkuna extends JFrame {
                     + "  Alapaneelin napeilla voit vaikuttaa käyrän korkeuteen ja pyytää uuden \n"
                     + "  vokaalin. Kun olet tutustunut tarpeeksi hyvin taajuuskäyrän toimintaan, \n"
                     + "  löytänyt selkeimmin vokaalit näyttävät parametrit ja säätänyt formantti- \n"
-                    + "  tajuudet oikealle kohdalleen, voit valita jonkin muun kielen. \n"
-                    + "  (tämä toiminto toteutetaan tulevaisuudessa)\n\n"
+                    + "  tajuudet oikealle kohdalleen, voit valita jonkin muun kielen. (tämä \n"
+                    + "  toiminto toteutetaan tulevaisuudessa) \n\n"
                     + "  Jos käyrällä ei näy mitään, tarkista että mikrofoni on kytkettynä ja että \n"
-                    + "  se ei ole mykistettynä ääniasetuksissa.\n");
+                    + "  se ei ole mykistettynä tietokoneesi ääniasetuksissa.\n");
         } else if (this.info == Info.PARAMETRIEN_VALINTA) {
             ohjeTekstialue.append(
                     "\n  Kokeile käynnistää vokaalipeliä eri parametreilla. Aluksi on ääniformaatin \n"

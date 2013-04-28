@@ -5,13 +5,12 @@ import java.util.ArrayList;
 /**
  * VokaaliInventorio sisältää jonkin tietyn kielen (esim. suomen) vokaalit.
  *
- *
  * @author A J Salmi
  */
 public class VokaaliInventorio {
 
     private String kieli;
-    private ArrayList<Vokaali> vokaalit;  // missä muodossa, tyypillisesti vokaaleita on kielessä vähän...
+    private ArrayList<Vokaali> vokaalit;
 
     /**
      * Konstruktori.
@@ -23,10 +22,6 @@ public class VokaaliInventorio {
         this.vokaalit = vokaalit;
         this.kieli = kieli;
     }
-
-//    public ArrayList<Vokaali> getVokaalit() {  // onko tämä tarpeen ???
-//        return this.vokaalit;
-//    }
 
     public String getKieli() {
         return this.kieli;
@@ -45,7 +40,7 @@ public class VokaaliInventorio {
     }
 
     /**
-     * antaa vokaalin
+     * Metodi antaa vokaalin halutusta indeksistä.
      *
      * @param indeksi halutun vokaalin indeksi
      * @return vokaali kyseisestä indeksistä tai null, jos indeksi virheellinen

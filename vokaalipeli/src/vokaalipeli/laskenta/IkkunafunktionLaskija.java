@@ -5,6 +5,8 @@ package vokaalipeli.laskenta;
  * Ikkunafunktion tarkoitus on heikentää signaalia aikaikkunan reunoilta, 
  * koska silloin FFT-muunnoksella laskettu taajuuskäyrä on selkeämpi eikä 
  * taajuuspiikki valuu ympärillään oleviin taajuuksiin (ns. 'spectral leakage').
+ * Suorakulmainen ikkunafunktio ei tee mitään vaan palauttaa kaikille indekseille
+ * kertoimen 1.
  *
  * @author A J Salmi
  * 
@@ -12,7 +14,7 @@ package vokaalipeli.laskenta;
  */
 public class IkkunafunktionLaskija {
 
-    private double[] korjauskertoimet;
+    private double[] ikkunaFunktionKertoimet;
 
     /**
      * Konstruktori, joka vastaa ikkunafunktion laskemisesta. 
@@ -28,15 +30,15 @@ public class IkkunafunktionLaskija {
             if (funktio == Ikkunafunktio.HANN) {
                 kertoimet[i] = 0.5 * (1 - Math.cos(i * 2 * Math.PI / (pituus - 1.0)));
             } else if (funktio == Ikkunafunktio.KOLMIO) {
-                double a = (pituus - 1)/2.0;
-                kertoimet[i] = 1 - Math.abs(i - a) / a;
+                double keskikohta = (pituus - 1)/2.0;
+                kertoimet[i] = 1 - Math.abs(i - keskikohta) / keskikohta;
             } else if (funktio == Ikkunafunktio.SUORAKULMAINEN) {
                 kertoimet[i] = 1;
             } else {
                 throw new IllegalArgumentException("virheellinen ikkunafunktio");
             }
         }
-        this.korjauskertoimet = kertoimet;
+        this.ikkunaFunktionKertoimet = kertoimet;
     }
 
     /**
@@ -47,6 +49,6 @@ public class IkkunafunktionLaskija {
      */
     
     public double annaKerroin(int indeksi) {
-        return this.korjauskertoimet[indeksi];
+        return this.ikkunaFunktionKertoimet[indeksi];
     }
 }

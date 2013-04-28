@@ -15,7 +15,7 @@ import vokaalipeli.laskenta.Ikkunafunktio;
 import vokaalipeli.laskenta.LaskentaKeskus;
 
 /**
- * Luokka 
+ * Luokka sisältää pelin ydintoiminnalisuuden...
  * 
  * @author A J Salmi
  */
@@ -24,17 +24,18 @@ public class Vokaalipeli implements Runnable {
     private Kayttoliittyma kayttoliittyma;
     private VokaaliInventorio kielenVokaalit;
     private Vokaali edellinenVokaali;
-    private double formanttienKorjauskerroin = 1.0; // nimeä paremmin
+    private double formanttienKorjauskerroin = 1.0; 
     private AaniLahde aanilahde;
     private LaskentaKeskus laskentakeskus;
 
     public Vokaalipeli() {
-        this.kielenVokaalit = new VokaaliInventorionLuoja().luoSuomenVokaalit();
+        this.kielenVokaalit = new VokaaliInventorionLuoja().luoVokaalit("suomi");
     }
 
     /**
      * Metodi palauttaa vokaali-inventoriosta vokaalin. Se ei saa olla sama kuin
-     * edellinen vokaali.
+     * edellinen vokaali. Se myös korjaa ääntöväylän yksilöllisistä vaihteluista
+     * johtuvat erot korjauskertoimella. 
      * 
      * @return uusi vokaali
      */
@@ -46,25 +47,29 @@ public class Vokaalipeli implements Runnable {
             uusiVokaali = kielenVokaalit.annaVokaali(arpoja.nextInt(vokaalienLkm));
         }
         this.edellinenVokaali = uusiVokaali;
-//        uusiVokaali = teeKorjaus(uusiVokaali);
+        uusiVokaali = teeKorjaus(uusiVokaali);
         return uusiVokaali;
     }
 
     /**
-     * Metodi ...
+     * Parametrina saadulla liukulukuarvolla kerrotaan aikaisempaa korjauskerrointa.
      * 
-     * @param kerroin
-     * @return 
+     * 
+     * @param kerroin kerroin jolla aikaisempaa korjauskerrointa muutetaan 
      */
-    public Vokaali annaUusiVokaali(double kerroin){
-        this.formanttienKorjauskerroin = kerroin;
-        return annaUusiVokaali();
+    public void muutaKorjausKerrointa (double kerroin){
+        this.formanttienKorjauskerroin *= kerroin;
     }
-
-    public void setAanilahde(AaniLahde a) {
-        this.aanilahde = a;
+    
+    public void setAanilahde(AaniLahde aanilahde) {
+        this.aanilahde = aanilahde;
     }
-
+    
+    /**
+     * Luodaan aikaikkunan koon avulla uusi Laskentakeskus
+     * 
+     * @param ikkunanKoko aikaikkunan koko
+     */
     public void asetaAikaikkunanKoko(int ikkunanKoko) {
         if (onKakkosenPotenssi(ikkunanKoko)) {
             this.laskentakeskus = new LaskentaKeskus(ikkunanKoko);
@@ -89,8 +94,8 @@ public class Vokaalipeli implements Runnable {
 
     /**
      * Metodi käynnistää pelin ensin luomalla uuden ArrayListin käsiteltäville
-     * aikaikkunoille, siirtyy whle-looppiin ja pysyy niin kauan kunnes peli
-     * pysäytetään. Loopin sisällä luetaan arvoja InputStreamistä, laitetaan ne
+     * aikaikkunoille, siirtyy while-looppiin ja pysyy niin kauan kunnes peli
+     * lopetetaan. Loopin sisällä luetaan arvoja InputStreamistä, laitetaan ne
      * jokaiseen käsittelyssä olevaan aikaikkunaan sopivalla korjauksella (esim.
      * 'Hann window function') joka heikentää signaalia ikkunan molemmista
      * päistä. Kun ikkuna on täynnä, lähetetään se FFT-muokkaajalle käsittelyyn
@@ -104,38 +109,36 @@ public class Vokaalipeli implements Runnable {
     @Override
     public void run() {
         AudioFormat formaatti = aanilahde.getStriimi().getFormat();
-        int aikaikkunanSiirtyma = (int) formaatti.getSampleRate() / 300; // 
+        int aikaikkunanSiirtyma = (int) formaatti.getSampleRate() / 300; // uusi taulukko aloitetaan 300 krt/s
         int tavuaPerNayte = formaatti.getFrameSize();
         boolean bigEndian = formaatti.isBigEndian();
 
         int naytteitaKasitelty = 0;
         int aikaikkunanPituus = this.laskentakeskus.getAikaikkunanPituus();
-        Queue<double[][]> kasiteltavat = new ArrayDeque<>();
+        Queue <double[][]> kasiteltavat = new ArrayDeque<>();                   
 
         while (true) {  // ikuinen looppi !            
 
             double luettuArvo = lueArvo(bigEndian, tavuaPerNayte);
 
             if (naytteitaKasitelty == aikaikkunanSiirtyma) {
-                luoUusiAikaikkuna(kasiteltavat, aikaikkunanPituus);
+                luoUusiAikaikkuna(kasiteltavat, aikaikkunanPituus);              
                 naytteitaKasitelty = 0;
             }
 
-            for (double[][] ikkuna : kasiteltavat) {
+            for (double[][] ikkuna : kasiteltavat) {                            
                 int indeksi = (int) ikkuna[1][0];
 
                 if (indeksi == aikaikkunanPituus - 1) { //  eli yksi aikaikkuna tuli täyteen
-                    boolean jouduttiinOdottamaan = false;
+                    boolean arvotPiirrettyAjallaan = kayttoliittyma.arvojenAsettaminenValmis();
                     while (!kayttoliittyma.arvojenAsettaminenValmis()) {
                         try {
-                            jouduttiinOdottamaan = true;
                             Thread.sleep(0, 1);
-                        } catch (InterruptedException ex) {
-                        }
+                        } catch (InterruptedException ex) {}
                     }
 
-                    if (!jouduttiinOdottamaan){
-                        double[] valmiitArvot = laskentakeskus.kasittele(ikkuna);
+                    if (arvotPiirrettyAjallaan) {
+                        double[] valmiitArvot = laskentakeskus.kasitteleValmisIkkuna(ikkuna);
                         kayttoliittyma.asetaArvot(valmiitArvot);
                     }
                     kasiteltavat.poll();
@@ -207,12 +210,19 @@ public class Vokaalipeli implements Runnable {
         kasiteltavatAikaikkunat.add(lisattava);
     }
 
-    private Vokaali teeKorjaus(Vokaali uusiVokaali) {
-        int[] vokaalinFormantit = uusiVokaali.getFormantit();
+    /**
+     * Luo annetun vokaalin pohjalta uuden vokaalin, jonka jokainen formantti kerrotaan 
+     * korjauskeroimella.
+     * 
+     * @param vokaali vokaali josta tehdään muokattu versio
+     * @return vokaali korjatuilla formanttitaajuuksilla
+     */    
+    private Vokaali teeKorjaus(Vokaali vokaali) {        
+        int[] vokaalinFormantit = vokaali.getFormantit();
         int[] korjatutFormantit = new int[3];
         for (int i = 0; i < 3; i++) {
-            korjatutFormantit[i] = (int) (vokaalinFormantit[i]*formanttienKorjauskerroin);
+            korjatutFormantit[i] = (int) (vokaalinFormantit[i] * formanttienKorjauskerroin);
         }
-        return new Vokaali(uusiVokaali.getNimi(), korjatutFormantit[0], korjatutFormantit[1], korjatutFormantit[2]);
+        return new Vokaali(vokaali.getNimi(), korjatutFormantit[0], korjatutFormantit[1], korjatutFormantit[2]);
     }
 }

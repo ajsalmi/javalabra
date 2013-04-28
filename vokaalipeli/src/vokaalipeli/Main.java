@@ -22,7 +22,7 @@ public class Main {
         Vokaalipeli peli = new Vokaalipeli();
         Kayttoliittyma kayttis = new PerusGUI(peli, 1000, 400);
         peli.setKayttoliittyma(kayttis);
-        kayttis.run();
+        kayttis.kaynnista();
         while (peli.getStriimi() == null) {
             try {
                 Thread.sleep(10);

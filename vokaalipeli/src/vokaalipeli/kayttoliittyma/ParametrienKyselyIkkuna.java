@@ -1,6 +1,5 @@
 package vokaalipeli.kayttoliittyma;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -21,20 +20,20 @@ import javax.swing.WindowConstants;
 import vokaalipeli.laskenta.Ikkunafunktio;
 
 /**
- * Tänne eriytetään ikkuna parametrien kyselyä varten.
+ * Ikkuna parametrien kyselyä varten.
  *
  * @author A J Salmi
  */
 public class ParametrienKyselyIkkuna extends JFrame {
 
-    private JButton kaynnistysnappi;
+    private JButton kaynnistysNappi;
     private JButton ohjeNappi;
-    private JComboBox<String> taajuusvalinta;
-    private ButtonGroup bitsPerSampleValinta;
+    private JComboBox<String> taajuusValinta;
+    private ButtonGroup tavuaPerNayteValinta;
     private JComboBox<Ikkunafunktio> ikkunafunktioValinta;
     private ButtonGroup etumerkillisyysValinta;
     private ButtonGroup tavujarjestysValinta;
-    private JTextField aikaikkunanValinta;
+    private JTextField aikaikkunanPituusValinta;
 
     public ParametrienKyselyIkkuna() {
         setPreferredSize(new Dimension(280, 480));
@@ -44,12 +43,12 @@ public class ParametrienKyselyIkkuna extends JFrame {
         setVisible(true);
     }
 
-    public JButton getKaynnistysnappi() {
-        return kaynnistysnappi;
+    public JButton getKaynnistysNappi() {
+        return kaynnistysNappi;
     }
 
     public int getNaytteenottoTaajuus() {
-        String valittuTaajuusMerkkijonona = (String) this.taajuusvalinta.getSelectedItem();
+        String valittuTaajuusMerkkijonona = (String) this.taajuusValinta.getSelectedItem();
         return Integer.parseInt(valittuTaajuusMerkkijonona.split("\\D")[0]);
     }
 
@@ -62,7 +61,7 @@ public class ParametrienKyselyIkkuna extends JFrame {
     }
 
     public int getIkkunanKoko() {
-        return Integer.parseInt(aikaikkunanValinta.getText().trim());
+        return Integer.parseInt(aikaikkunanPituusValinta.getText().trim());
     }
 
     public boolean getTavujarjestys() {
@@ -78,97 +77,35 @@ public class ParametrienKyselyIkkuna extends JFrame {
     }
 
     public int getTavuaPerNayte() {
-        AbstractButton valittuNappi = etsiValittuNappi(bitsPerSampleValinta);
+        AbstractButton valittuNappi = etsiValittuNappi(tavuaPerNayteValinta);
         String arvoMerkkinona = valittuNappi.getText().split("\\D")[0];
         return Integer.parseInt(arvoMerkkinona);
     }
 
     /**
+     * Täytetään Container-luokan olio halutuilla komponenteilla: napit ja 
+     * valikot audioformaatin valintaa varten (näytteenottotaajuus 'sample rate', 
+     * näytteen tavumäärä 'bits per sample', etumerkillisyys, tavujärjestys
+     * 'endianness') ja ikkunafunktiolle sekä aikaikkunan pituudelle. Lisäksi
+     * asetetaan käynnistys- ja ohjenapit.
+     * 
      * @param container
      */
     private void luoKomponentit(Container container) {
-        GridLayout layout = new GridLayout(25, 1);
-        container.setLayout(layout);
-//----------------------------------------------------------
-        container.add(new JLabel(" näytteenottotaajuus"));
-        String[] taajuusvaihtoehdot = {"8000 Hz", "11025 Hz", "16000 Hz", "22050 Hz", "44100 Hz"};
-        taajuusvalinta = new JComboBox<>(taajuusvaihtoehdot);
-        taajuusvalinta.setSelectedIndex(3);
-        container.add(taajuusvalinta);
-        container.add(new JLabel(" "));
-//// --------------------------------------------------------        
-        container.add(new JLabel(" näytteen koko bitteinä"));
-        bitsPerSampleValinta = new ButtonGroup();
-        JRadioButton nappi = new JRadioButton("8 bittiä");
-        bitsPerSampleValinta.add(nappi);
-        container.add(nappi);
-        nappi = new JRadioButton("16 bittiä");
-        nappi.setSelected(true);
-        bitsPerSampleValinta.add(nappi);
-        container.add(nappi);
-        container.add(new JLabel(" "));
-//// --------------------------------------------------------
-        container.add(new JLabel(" etumerkillisyys"));
-        etumerkillisyysValinta = new ButtonGroup();
-        nappi = new JRadioButton("etumerkillinen");
-        nappi.setSelected(true);
-        etumerkillisyysValinta.add(nappi);
-        container.add(nappi);
-        nappi = new JRadioButton("etumerkitön");
-        etumerkillisyysValinta.add(nappi);
-        container.add(nappi);
-        container.add(new JLabel(" "));
-//// --------------------------------------------------------
-        container.add(new JLabel(" tavujärjestys"));
-        tavujarjestysValinta = new ButtonGroup();
-        nappi = new JRadioButton("big-endian");
-        nappi.setSelected(true);
-        tavujarjestysValinta.add(nappi);
-        container.add(nappi);
-        nappi = new JRadioButton("little-endian");
-        tavujarjestysValinta.add(nappi);
-        container.add(nappi);
-        container.add(new JLabel(" "));
-//// --------------------------------------------------------
-        container.add(new JLabel(" ikkunafunktio"));
-        Ikkunafunktio[] ikkunafunktiot = Ikkunafunktio.values();
-        ikkunafunktioValinta = new JComboBox<>(ikkunafunktiot);
-        container.add(ikkunafunktioValinta);
-        container.add(new JLabel(" "));
-//------------------------------------------------
-        container.add(new JLabel(" aikaikkunan koko"));
-        aikaikkunanValinta = new JTextField("8192");
-        aikaikkunanValinta.setEditable(false);
-        container.add(aikaikkunanValinta);
-        JPanel paneeliPlussalleJaMiinukselle = new JPanel();
-        paneeliPlussalleJaMiinukselle.setLayout(new BoxLayout(paneeliPlussalleJaMiinukselle, BoxLayout.X_AXIS));
-        JButton plussa = new JButton("     *2     ");
-        paneeliPlussalleJaMiinukselle.add(plussa);
-        plussa.addActionListener(new PlusJaMiinusnapinKuuntelija(aikaikkunanValinta));
-        JButton miinus = new JButton("     /2     ");
-        miinus.addActionListener(plussa.getActionListeners()[0]);
-        paneeliPlussalleJaMiinukselle.add(miinus);
-        container.add(paneeliPlussalleJaMiinukselle);
-        container.add(new JLabel(" "));
-        //------------------------------------------ 
-        kaynnistysnappi = new JButton("Käynnistä");
-        container.add(kaynnistysnappi);
-        ohjeNappi = new JButton(" ohje ");
-        container.add(ohjeNappi);
-        ohjeNappi.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new Infoikkuna(Info.PARAMETRIEN_VALINTA, ohjeNappi);
-            }
-        });
-
-
+        container.setLayout(new GridLayout(25, 1));        
+        luoTaajuusValinta(container);
+        luoTavuaPerNayteValinta(container);
+        luoEtumerkillisyysValinta(container);
+        luoTavujarjestysValinta(container);
+        luoIkkunaFunktionValinta(container);
+        luoAikaikkunanPituusValinta(container);
+        asetaLoputNapit(container);
     }
 
     /**
-     * Etsii valitun napin annetusta nappiryhmästä.
+     * Etsii valitun napin annetusta nappiryhmästä (ButtonGroup).
      * 
-     * @param nappiryhma johonkin valintaan liittyvät vaihtoehdot
+     * @param nappiryhma nappiryhmä
      * @return valittu nappi tai null jos ei mitään valittuna
      */
     private AbstractButton etsiValittuNappi(ButtonGroup nappiryhma) {
@@ -182,30 +119,122 @@ public class ParametrienKyselyIkkuna extends JFrame {
         return null;
     }
 
-    private static class PlusJaMiinusnapinKuuntelija implements ActionListener {
+    private void luoTaajuusValinta(Container container) {
+        container.add(new JLabel(" näytteenottotaajuus"));
+        String[] taajuusvaihtoehdot = {"8000 Hz", "11025 Hz", "16000 Hz", "22050 Hz", "44100 Hz"};
+        taajuusValinta = new JComboBox<>(taajuusvaihtoehdot);
+        taajuusValinta.setSelectedIndex(3);
+        container.add(taajuusValinta);
+        container.add(new JLabel(" "));
+    }
 
-        JTextField aikaikkunanValintaKentta;
+    private void luoTavuaPerNayteValinta(Container container) {
+        container.add(new JLabel(" näytteen koko bitteinä"));
+        tavuaPerNayteValinta = new ButtonGroup();
+        JRadioButton nappi = new JRadioButton("8 bittiä");
+        tavuaPerNayteValinta.add(nappi);
+        container.add(nappi);
+        nappi = new JRadioButton("16 bittiä");
+        nappi.setSelected(true);
+        tavuaPerNayteValinta.add(nappi);
+        container.add(nappi);
+        container.add(new JLabel(" "));
+    }
 
-        private PlusJaMiinusnapinKuuntelija(JTextField aikaikkunanValintaKentta) {
-            this.aikaikkunanValintaKentta = aikaikkunanValintaKentta;
-        }
+    private void luoEtumerkillisyysValinta(Container container) {
+        container.add(new JLabel(" etumerkillisyys"));
+        etumerkillisyysValinta = new ButtonGroup();
+        JRadioButton nappi = new JRadioButton("etumerkillinen");
+        nappi.setSelected(true);
+        etumerkillisyysValinta.add(nappi);
+        container.add(nappi);
+        nappi = new JRadioButton("etumerkitön");
+        etumerkillisyysValinta.add(nappi);
+        container.add(nappi);
+        container.add(new JLabel(" "));
+    }
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int ikkunanPituus = Integer.parseInt(aikaikkunanValintaKentta.getText());
-            if (e.getActionCommand().trim().equals("*2")) {
-                ikkunanPituus *= 2;
-                if (ikkunanPituus > 32768) {  // minne asti kannattaa laittaa ehdotuksia?
-                    ikkunanPituus = 32768;
+    private void luoTavujarjestysValinta(Container container) {
+        container.add(new JLabel(" tavujärjestys"));
+        tavujarjestysValinta = new ButtonGroup();
+        JRadioButton nappi = new JRadioButton("big-endian");
+        nappi.setSelected(true);
+        tavujarjestysValinta.add(nappi);
+        container.add(nappi);
+        nappi = new JRadioButton("little-endian");
+        tavujarjestysValinta.add(nappi);
+        container.add(nappi);
+        container.add(new JLabel(" "));
+    }
+
+    private void luoIkkunaFunktionValinta(Container container) {
+        container.add(new JLabel(" ikkunafunktio"));
+        Ikkunafunktio[] ikkunafunktiot = Ikkunafunktio.values();
+        ikkunafunktioValinta = new JComboBox<>(ikkunafunktiot);
+        container.add(ikkunafunktioValinta);
+        container.add(new JLabel(" "));
+    }
+
+    private void luoAikaikkunanPituusValinta(Container container) {
+        container.add(new JLabel(" aikaikkunan koko"));
+        aikaikkunanPituusValinta = new JTextField("8192");
+        aikaikkunanPituusValinta.setEditable(false);
+        container.add(aikaikkunanPituusValinta);
+        // ---
+        JPanel paneeliSaatoNapeille = new JPanel(); // lue: "SäätöNapeille"
+        paneeliSaatoNapeille.setLayout(new BoxLayout(paneeliSaatoNapeille, BoxLayout.X_AXIS));
+        JButton kasvatusNappi = new JButton("     *2     ");
+        paneeliSaatoNapeille.add(kasvatusNappi);
+        kasvatusNappi.addActionListener(luoAikaikkunanValinnanNappienKuuntelija());
+        // ---
+        JButton pienennysNappi = new JButton("     /2     ");
+        pienennysNappi.addActionListener(kasvatusNappi.getActionListeners()[0]);
+        paneeliSaatoNapeille.add(pienennysNappi);
+        // ---
+        container.add(paneeliSaatoNapeille);
+        container.add(new JLabel(" "));
+    }
+
+    private ActionListener luoAikaikkunanValinnanNappienKuuntelija() {
+        ActionListener a = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int ikkunanPituus = Integer.parseInt(aikaikkunanPituusValinta.getText());
+                if (e.getActionCommand().trim().equals("*2")) {
+                    ikkunanPituus *= 2;
+                    if (ikkunanPituus > 32768) {  // minne asti kannattaa laittaa ehdotuksia?
+                        ikkunanPituus = 32768;
+                    }
+                    aikaikkunanPituusValinta.setText(ikkunanPituus + "");
+                } else {
+                    ikkunanPituus /= 2;
+                    if (ikkunanPituus < 64) { // minne asti ehdotuksia ?
+                        ikkunanPituus = 64;
+                    }
+                    aikaikkunanPituusValinta.setText(ikkunanPituus + "");
                 }
-                aikaikkunanValintaKentta.setText(ikkunanPituus + "");
-            } else {
-                ikkunanPituus /= 2;
-                if (ikkunanPituus < 64) { // minne asti ehdotuksia ?
-                    ikkunanPituus = 64;
-                }
-                aikaikkunanValintaKentta.setText(ikkunanPituus + "");
             }
-        }
+        };
+        return a;
+    }
+    
+    /**
+     * Metodi asettaa käynnistys- ja ohjenapit. Ohjenappiin laitetaan lisäksi
+     * kuuntelija infoikkunan luomista varten.
+     * 
+     * @param container 
+     */    
+    private void asetaLoputNapit(Container container) {
+        kaynnistysNappi = new JButton("Käynnistä");
+        container.add(kaynnistysNappi);
+        
+        ohjeNappi = new JButton(" ohje ");
+        container.add(ohjeNappi);
+        ohjeNappi.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new Infoikkuna(Info.PARAMETRIEN_VALINTA, ohjeNappi);
+            }
+        });
     }
 }

@@ -9,7 +9,8 @@ import vokaalipeli.peli.Vokaalipeli;
 
 /**
  * Luokka koordinoi Taajuuskäyrä-olion luomista, parametrien kysymistä
- * käyttäjältä ja niiden antamista Vokaalipeli-luokan oliolle.
+ * käyttäjältä ja niiden antamista Vokaalipeli-luokan oliolle. Ainoa
+ * luokka käyttöliittymä-paketissa joka tietää Vokaalipelin olemassaolosta.
  *
  * @author A J Salmi
  * @see Vokaalipeli
@@ -18,21 +19,20 @@ import vokaalipeli.peli.Vokaalipeli;
  */
 public class PerusGUI implements Kayttoliittyma {
 
-    private ParametrienKyselyIkkuna kyselyIkkuna;
-    private Paaikkuna paaikkuna;
     private int korkeus;
     private int leveys;
+    private ParametrienKyselyIkkuna kyselyIkkuna;
+    private Paaikkuna paaikkuna;
     private Vokaalipeli peli;
 
     /**
-     * Konstruktori luo Taajuuskäyrä-luokan olion saamiensa mittojen mukaisesti,
-     * kysyy kaikkia tarvittavia parametreja käyttäjältä ja
+     * Konstruktorissa asetetaan oliomuuttujiin korkeus, leveys ja peli
+     * parametreina saadut arvot.
      *
      * @param peli vokaalipeli
      * @param leveys luotavan pääikkunan leveys
      * @param korkeus luotavan pääikkunan korkeus
      * @see Vokaalipeli
-     * @see Taajuuskayra
      */
     public PerusGUI(Vokaalipeli peli, int leveys, int korkeus) {
         this.korkeus = korkeus;
@@ -40,22 +40,38 @@ public class PerusGUI implements Kayttoliittyma {
         this.peli = peli;
     }
 
+    /**
+     * Kayttoliittyma-rajapinnan vaatima metodi. Asettaa pääikkunaan oliomuuttujana
+     * olevalle taajuuskäyrälle saamansa arvot.
+     * 
+     * @param arvot 
+     * @see Kayttoliittyma
+     */
     public void asetaArvot(double[] arvot) {
-        this.paaikkuna.asetaArvotTaajuuskayralle(arvot);
+        this.paaikkuna.getTaajuuskayra().setArvot(arvot);
     }
 
     /**
-     * Runnable-rajapinnan toteuttavan luokan run()-metodi, jossa luodaan ensin
-     * kyselyikkunan ja liitetään sen käynnistysnappiin tapahtumakuuntelijan,
-     * joka puolestaan asettaa Vokaalipelille tarvittavat parametrit.
-     *
-     * @see Runnable
+     * Kayttoliittyma-rajapinnan vaatima metodi sen tarkistukseen onko arvojen 
+     * asettaminen valmiina.
+     * 
+     * @return tieto siitä onko arvojen asettaminen valmiina
      */
-    @Override
-    public void run() {
+    public boolean arvojenAsettaminenValmis() {
+        return this.paaikkuna.getTaajuuskayra().getPiirtoValmiina();
+    }    
+    
+    /**
+     * Kayttoliittyma-rajapinnan vvatima metodi. Siinä luodaan ensin kyselyikkuna 
+     * ja liitetään sen käynnistysnappiin tapahtumakuuntelija, joka puolestaan 
+     * asettaa tapahtuman toteutuessa Vokaalipelille tarvittavat parametrit.
+     *
+     * @see Kayttoliittyma
+     */
+    public void kaynnista() {
         this.kyselyIkkuna = new ParametrienKyselyIkkuna();
 
-        kyselyIkkuna.getKaynnistysnappi().addActionListener(new ActionListener() {
+        kyselyIkkuna.getKaynnistysNappi().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int ikkunanKoko = kyselyIkkuna.getIkkunanKoko();
@@ -74,12 +90,11 @@ public class PerusGUI implements Kayttoliittyma {
                     peli.setAanilahde(new Mikrofoni(formaatti));
                     Taajuuskayra taajuuskayra = new Taajuuskayra(korkeus - 70, leveys - 20, 60000, naytteenottoTaajuus / 2);
                     paaikkuna = new Paaikkuna(taajuuskayra, leveys, korkeus);
-//                    paaikkuna.addKeyListener(new NappaimistonKuuntelija(paaikkuna));
                     asetaKuuntelijat();
                     kyselyIkkuna.dispose();
                     kyselyIkkuna = null;
                 } catch (IllegalArgumentException ex) {
-                    new Infoikkuna(Info.EI_TUETTU_FORMAATTI, kyselyIkkuna.getKaynnistysnappi());
+                    new Infoikkuna(Info.EI_TUETTU_FORMAATTI, kyselyIkkuna.getKaynnistysNappi());
                 }
             }
         });
@@ -90,13 +105,10 @@ public class PerusGUI implements Kayttoliittyma {
         vokaalinvaihtoNappi.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                paaikkuna.asetaVokaali(peli.annaUusiVokaali());
+                Taajuuskayra kayra = paaikkuna.getTaajuuskayra();
+                peli.muutaKorjausKerrointa(kayra.getKorjausKerroin());
+                kayra.setVokaali(peli.annaUusiVokaali());
             }
         });
-    }
-
-    @Override
-    public boolean arvojenAsettaminenValmis() {
-        return this.paaikkuna.getTaajuuskayra().getPiirtoValmiina();
     }
 }

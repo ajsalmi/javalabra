@@ -7,12 +7,11 @@ package vokaalipeli.kayttoliittyma;
  *
  * @author A J Salmi
  */
-public interface Kayttoliittyma extends Runnable{
+public interface Kayttoliittyma {
 
     public void asetaArvot(double[] arvot);
     
     public boolean arvojenAsettaminenValmis();
 
-    @Override
-    public void run();
+    public void kaynnista();
 }

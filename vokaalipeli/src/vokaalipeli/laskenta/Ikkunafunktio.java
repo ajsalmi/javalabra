@@ -3,7 +3,6 @@ package vokaalipeli.laskenta;
 
 /**
  * Luettelee eri ikkunafuntiot.
- *
  * 
  * @author A J Salmi
  */

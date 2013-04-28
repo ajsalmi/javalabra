@@ -7,21 +7,21 @@ import javax.swing.JPanel;
 import vokaalipeli.domain.Vokaali;
 
 /**
- * Luokka vastaa taajuuskäyrän piirtämisestä/päivittämisestä.
+ * Luokka vastaa taajuuskäyrän ja piirrettävän vokaalin päivittämisestä. 
  *
  * @author A J Salmi
  */
 public class Taajuuskayra extends JPanel {
 
-    private Vokaali verrattavaVokaali;
-    private double vokaalinKorjauskerroin = 1;
+    private Vokaali piirrettavaVokaali;
+    private double korjausKertoimenMuutos = 1;
     private int korkeus;
     private int leveys;
-    private double[] arvot;
-    private double maxArvo;
+    private double[] amplitudit;
+    private double maxAmplitudi;
     private double[] suhteellisetTaajuudet;   // eka on 0 ja viimeinen on 1 
     private int maxTaajuus;
-    private boolean piirtoValmiina;
+    private boolean piirtoValmiina = true;
 
     /**
      * Konstruktori.
@@ -30,33 +30,42 @@ public class Taajuuskayra extends JPanel {
      * @param leveys piirtoalustan leveys
      * @param maxAmplitudi määrittää sen, kuinka suuret arvot mahtuvat kuvaajaan
      */
-    public Taajuuskayra(int korkeus, int leveys, int maxAmplitudi, int suurinEsitettavaTaajuus) {
-        super.setBackground(Color.DARK_GRAY);
+    public Taajuuskayra(int korkeus, int leveys, int maxAmplitudi, int maxTaajuus) {
         this.korkeus = korkeus;
         this.leveys = leveys;
-        this.piirtoValmiina = true;
-        this.maxArvo = maxAmplitudi;
-        this.maxTaajuus = suurinEsitettavaTaajuus;
+        this.maxAmplitudi = maxAmplitudi;
+        this.maxTaajuus = maxTaajuus;
+        setBackground(Color.DARK_GRAY.darker());
     }
 
-    public void kasvataKerrointa() {
-        this.vokaalinKorjauskerroin *= 1.001;
+    public void kasvataKorjausKerrointa() {
+        this.korjausKertoimenMuutos *= 1.001;
     }
 
-    public void pienennaKerrointa() {
-        this.vokaalinKorjauskerroin *= 0.999;
+    public void pienennaKorjausKerrointa() {
+        this.korjausKertoimenMuutos *= 0.999;
     }
 
-    public void setVokaali(Vokaali verrattava) {
-        this.verrattavaVokaali = verrattava;
+    /**
+     * 
+     * 
+     * @param uusiVokaali uusi vokaali
+     */
+    public void setVokaali(Vokaali uusiVokaali) {
+        this.korjausKertoimenMuutos = 1;
+        this.piirrettavaVokaali = uusiVokaali;
     }
 
+    public double getKorjausKerroin(){
+        return this.korjausKertoimenMuutos;
+    }
+    
     public boolean getPiirtoValmiina() {
         return this.piirtoValmiina;
     }
 
     /**
-     * Metodi ottaa vastaan uudet arvot ja kutsuu piirtämismetodia.
+     * Metodi ottaa vastaan uudet arvot ja kutsuu päivitysmetodia.
      *
      * @param uudetArvot taajuuskäyrälle syötetyt uudet arvot
      */
@@ -65,17 +74,16 @@ public class Taajuuskayra extends JPanel {
         if (this.suhteellisetTaajuudet == null) {
             luoTasavalisetTaajuudet(uudetArvot.length);
         }
-
-        this.arvot = uudetArvot;
+        this.amplitudit = uudetArvot;
         paivita();
     }
 
     /**
-     * Kasvattaa piirrettävien arvojen maksimia. Hyödyllinen jos käyrän arvot
-     * eivät mahdu visualisointiin varattuun tilaan.
+     * Kasvattaa piirrettävien arvojen maksimia. Hyödyllinen jos käyrä ei mahdu
+     * ikkunaan.
      */
     public void kasvataMaxArvoa() {
-        this.maxArvo = 1.8 * maxArvo;
+        this.maxAmplitudi = 1.8 * maxAmplitudi;
     }
 
     /**
@@ -83,36 +91,38 @@ public class Taajuuskayra extends JPanel {
      * liian pienenä.
      */
     public void pienennaMaxArvoa() {
-        this.maxArvo = 0.6 * maxArvo;
+        this.maxAmplitudi = 0.6 * maxAmplitudi;
     }
 
+    /**
+     * Yläluokan korvattu metodi.
+     * 
+     * @param g grafiikkaolio
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         g.setColor(Color.WHITE);
         g.fill3DRect(2, 2, leveys, korkeus, true);
 
-        if (arvot == null || suhteellisetTaajuudet == null) {
-            return;
-        }
-
-        if (verrattavaVokaali != null) {
+        if (amplitudit == null || suhteellisetTaajuudet == null) return;
+        
+        if (piirrettavaVokaali != null) {
             piirraVokaalinFormantitJaNimi(g);
         }
-
+        
         g.setColor(Color.BLACK);
-        for (int i = 0; i < arvot.length - 1; i++) {
+        for (int i = 0; i < amplitudit.length - 1; i++) {
             piirraViiva(g, i, 1);
         }
 
         g.setColor(Color.GRAY);
         g.draw3DRect(2, 2, leveys, korkeus, true);
-        
         this.piirtoValmiina = true;
     }
 
     /**
-     * Metodi kutsuu yläluokan (JPanel) repaint()-metodia.
+     * Metodi kutsuu yläluokan (JPanel) repaint-metodia.
      */
     public void paivita() {
         repaint();
@@ -126,14 +136,12 @@ public class Taajuuskayra extends JPanel {
      * @param viivanPaksuus viivan paksuus leveyssuunnassa
      */
     private void piirraViiva(Graphics grafiikka, int i, int viivanPaksuus) {
-
         int alkuX, alkuY, loppuX, loppuY;
-
         for (int j = 0; j < viivanPaksuus; j++) {
             alkuX = (int) (leveys * suhteellisetTaajuudet[i]) + j;
-            alkuY = (int) (korkeus * (1 - arvot[i] / maxArvo));
+            alkuY = (int) (korkeus * (1 - amplitudit[i] / maxAmplitudi));
             loppuX = (int) (leveys * suhteellisetTaajuudet[i + 1]) + j;
-            loppuY = (int) (korkeus * (1 - arvot[i + 1] / maxArvo));
+            loppuY = (int) (korkeus * (1 - amplitudit[i + 1] / maxAmplitudi));
             grafiikka.drawLine(alkuX, alkuY, loppuX, loppuY);
         }
     }
@@ -142,36 +150,36 @@ public class Taajuuskayra extends JPanel {
      * Metodi luo tasaväliset taajuudet jakamalla käyrän leveyden annettuun
      * määrään pisteitä.
      *
-     * @param taajuuksia moneenko eri tasaväliseen pisteeseen taajuudet
-     * jakautuvat.
+     * @param eriTaajuuksienLkm moneenko eri tasaväliseen pisteeseen käyrän leveys
+     * pitää jakaa.
      */
-    private void luoTasavalisetTaajuudet(int taajuuksia) {
-        double[] tasavalisetTaajuudet = new double[taajuuksia];
-        for (int i = 0; i < taajuuksia; i++) {
-            tasavalisetTaajuudet[i] = (i + 1.0) / (taajuuksia + 1.0);
+    private void luoTasavalisetTaajuudet(int eriTaajuuksienLkm) {
+        double[] tasavalisetTaajuudet = new double[eriTaajuuksienLkm];
+        for (int i = 0; i < eriTaajuuksienLkm; i++) {
+            tasavalisetTaajuudet[i] = (i + 1.0) / (eriTaajuuksienLkm + 1.0);
         }
         suhteellisetTaajuudet = tasavalisetTaajuudet;
     }
 
     /**
-     * Metodi piirtää verrattavan vokaalin formanttitaajuudet käyrälle.
+     * Metodi piirtää vokaalin formanttitaajuudet ja nimen.
      *
      */
     private void piirraVokaalinFormantitJaNimi(Graphics g) {
         g.setColor(Color.YELLOW);
         int kaistaleenLeveys = 700_000 / maxTaajuus;
-        for (int taajuus : verrattavaVokaali.getFormantit()) {
-            g.fillRect((int) (vokaalinKorjauskerroin*leveys * taajuus / maxTaajuus) - kaistaleenLeveys / 2, 2, kaistaleenLeveys, korkeus - 2);
+        for (int taajuus : piirrettavaVokaali.getFormantit()) {
+            g.fillRect((int) (korjausKertoimenMuutos * leveys * taajuus / maxTaajuus) - kaistaleenLeveys / 2, 2, kaistaleenLeveys, korkeus - 2);
         }
 
         g.setColor(Color.ORANGE);
         kaistaleenLeveys = 200_000 / maxTaajuus;
-        for (int taajuus : verrattavaVokaali.getFormantit()) {
-            g.fillRect((int) (vokaalinKorjauskerroin*leveys * taajuus / maxTaajuus) - kaistaleenLeveys / 2, 2, kaistaleenLeveys, korkeus - 2);
+        for (int taajuus : piirrettavaVokaali.getFormantit()) {
+            g.fillRect((int) (korjausKertoimenMuutos * leveys * taajuus / maxTaajuus) - kaistaleenLeveys / 2, 2, kaistaleenLeveys, korkeus - 2);
         }
         
         g.setColor(Color.BLACK);
         g.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 100));
-        g.drawString(verrattavaVokaali.getNimi(), (int) (leveys * 0.9), (int) (korkeus * 0.3));
+        g.drawString(piirrettavaVokaali.getNimi(), (int) (leveys * 0.9), (int) (korkeus * 0.3));
     }
 }

@@ -33,24 +33,24 @@ public class VokaaliTest {
 
     @Test
     public void vokaalinEkaFormanttiOikein() {
-        assertEquals(720, testattavaVokaali.getEkaFormantti());
+        assertEquals(720, testattavaVokaali.getFormantit()[0]);
         asetaE();
-        assertEquals(450, testattavaVokaali.getEkaFormantti());
+        assertEquals(450, testattavaVokaali.getFormantit()[0]);
 
     }
 
     @Test
     public void vokaalinTokaFormanttiOikein() {
-        assertEquals(1240, testattavaVokaali.getTokaFormantti());
+        assertEquals(1240, testattavaVokaali.getFormantit()[1]);
         asetaE();
-        assertEquals(2240, testattavaVokaali.getTokaFormantti());
+        assertEquals(2240, testattavaVokaali.getFormantit()[1]);
     }
 
     @Test
     public void vokaalinKolmasFormanttiOikein() {
-        assertEquals(2455, testattavaVokaali.getKolmasFormantti());
+        assertEquals(2455, testattavaVokaali.getFormantit()[2]);
         asetaE();
-        assertEquals(2810, testattavaVokaali.getKolmasFormantti());
+        assertEquals(2810, testattavaVokaali.getFormantit()[2]);
     }
 
     @Test

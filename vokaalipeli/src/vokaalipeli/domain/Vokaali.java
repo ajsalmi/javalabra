@@ -9,7 +9,7 @@ import java.util.Objects;
  */
 public class Vokaali {
 
-    private String nimi;  // IPA unicode (??) / latinalaisilla aakkosilla(?)/ niinkuin kielessä kirjoitetaan ? / esimerkkisana ?
+    private String vokaalinNimi;  // IPA / latinalaisilla aakkosilla / esimerkkisana ???
     private int[] formantit = new int[3];
 
     /**
@@ -21,12 +21,19 @@ public class Vokaali {
      * @param kolmasFormantti vokaalin kolmas formanttitaajuus
      */
     public Vokaali(String nimi, int ekaFormantti, int tokaFormantti, int kolmasFormantti) {
-        this.nimi = nimi;
+        this.vokaalinNimi = nimi;
         this.formantit[0] = ekaFormantti;
         this.formantit[1] = tokaFormantti;
         this.formantit[2] = kolmasFormantti;
     }
 
+    public String getNimi() {
+        return this.vokaalinNimi;
+    }
+
+    public int[] getFormantit(){
+        return this.formantit;
+    }
 
     /**
      * Object-luokan ylikirjoitettu equals-metodi. Vokaalit ovat samat, jos niiden
@@ -44,7 +51,7 @@ public class Vokaali {
         if (this.formantit[0] != verratava.formantit[0]) return false;
         if (this.formantit[1] != verratava.formantit[1]) return false;
         if (this.formantit[2] != verratava.formantit[2]) return false;
-        if (!this.nimi.equals(verratava.nimi)) return false;
+        if (!this.vokaalinNimi.equals(verratava.vokaalinNimi)) return false;
         
         return true;
     }
@@ -56,30 +63,10 @@ public class Vokaali {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 97 * hash + Objects.hashCode(this.nimi);
+        hash = 97 * hash + Objects.hashCode(this.vokaalinNimi);
         hash = 97 * hash + formantit[0];//this.ekaFormantti;
         hash = 97 * hash + formantit[1];//this.tokaFormantti;
         hash = 97 * hash + formantit[2];//this.kolmasFormantti;
         return hash;
-    }
-
-    public String getNimi() {
-        return this.nimi;
-    }
-
-    public int[] getFormantit(){
-        return this.formantit;
-    }
-    
-    public int getEkaFormantti() {
-        return formantit[0];
-    }
-
-    public int getTokaFormantti() {
-        return formantit[1];
-    }
-
-    public int getKolmasFormantti() {
-        return formantit[2];
     }
 }

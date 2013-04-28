@@ -20,7 +20,7 @@ public class Mikrofoni implements AaniLahde {
     private AudioInputStream striimi;
 
     /**
-     * Konstruktori, kutsuu metodia luoInputStream parametrina saamallaan
+     * Konstruktori, kutsuu luoInputStream-metodia parametrina saamallaan
      * formaatilla.
      * 
      * @param formaatti ääniformaatti 
@@ -29,7 +29,6 @@ public class Mikrofoni implements AaniLahde {
         luoInputStream(formaatti);
     }
 
-    @Override
     public AudioInputStream getStriimi() {
         return this.striimi;
     }
@@ -49,7 +48,6 @@ public class Mikrofoni implements AaniLahde {
             linja.start();
             stream = new AudioInputStream(linja);
         } catch (LineUnavailableException ex) {
-            System.out.println(ex);
         }
         this.striimi = stream;
     }

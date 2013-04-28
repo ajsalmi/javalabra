@@ -45,7 +45,7 @@ public class LaskentaKeskus {
      * @param ikkuna käsiteltävä aikaikkuna
      * @return käsitellyt amplitudit
      */
-    public double[] kasittele(double[][] ikkuna) {
+    public double[] kasitteleValmisIkkuna(double[][] ikkuna) {
         ikkuna[1] = new double[aikaikkunanPituus];
         ikkuna = fftMuokkaaja.muokkaaFFT(ikkuna, true);
         double[] arvot = laskeAmplitudit(ikkuna);

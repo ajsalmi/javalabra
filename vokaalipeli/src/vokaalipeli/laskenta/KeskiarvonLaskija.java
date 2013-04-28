@@ -4,12 +4,14 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 /**
- * [Tätä luokkaa ei tässä vaiheessa projektia vielä käytetä]
+ * [Tarkoitus olisi saada käyttöliittymään napit, joiden painaminen muutaman 
+ * mutkan kautta päätyisi tänne. Ei ehdi tähän toteutukseen.]
  * 
- * Luokka laskee edellisten taulukoiden keskiarvon (aikasarjan suuntaisesti)
+ * Luokka laskee edellisten taulukoiden keskiarvon (taulukon jokaisessa indeksissä 
+ * olevan arvon ja edellisten taulukoiden vastaavaan indeksin arvojen keskiarvo)
  *
  * TODO: ja tasoittaa myös taulukon arvoja (keskiarvo taulukon viereisissä 
- * indekseissä olevista arvoista) ???.
+ * indekseissä olevista arvoista).
  *
  * @author A J Salmi
  */
