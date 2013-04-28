@@ -5,8 +5,8 @@ import vokaalipeli.kayttoliittyma.PerusGUI;
 import vokaalipeli.peli.Vokaalipeli;
 
 /**
- * Pääluokka joka vain luo Vokaalipeli-luokan olion luomisen lisäksi luo 
- * Kayttoliittyma-luokan olion ja käynnistää sen.
+ * Pääluokka joka Vokaalipeli-luokan ja Kayttoliittyma-luokan 
+ * olioiden luomisen lisäksi luo käynnistää ne.
  * 
  * @author A J Salmi
  */
@@ -23,13 +23,12 @@ public class Main {
         Kayttoliittyma kayttis = new PerusGUI(peli, 1000, 400);
         peli.setKayttoliittyma(kayttis);
         kayttis.kaynnista();
-        while (peli.getStriimi() == null) {
+        while (!peli.aaniLahdeAsetettu()) {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException ex) {
             }
-        }
-//        peli.kaynnista();  
+        } 
         peli.run();
     }
 }

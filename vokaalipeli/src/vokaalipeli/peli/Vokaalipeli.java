@@ -5,17 +5,22 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.Random;
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
 import vokaalipeli.domain.Vokaali;
 import vokaalipeli.domain.VokaaliInventorio;
 import vokaalipeli.kayttoliittyma.AaniLahde;
 import vokaalipeli.kayttoliittyma.Kayttoliittyma;
+import vokaalipeli.kayttoliittyma.Taajuuskayra;
 import vokaalipeli.laskenta.FastFourierMuokkaaja;
 import vokaalipeli.laskenta.Ikkunafunktio;
 import vokaalipeli.laskenta.LaskentaKeskus;
 
 /**
- * Luokka sisältää pelin ydintoiminnalisuuden...
+ * Luokka sisältää pelin ydintoiminnallisuuden. 
+ * 
+ * [Tällä luokalla on liikaa vastuita ja tehtäviä. Taulukkomuotoisten
+ * aikaikkunoiden käsittelyä voisi siirtää laskennalle ja/tai arvon lukemisen
+ * äänilähteelle. Myös uuden vokaalin arpomista voisi harkita siirrettäväksi
+ * vaikka vokaali-inventoriolle.]
  * 
  * @author A J Salmi
  */
@@ -34,8 +39,7 @@ public class Vokaalipeli implements Runnable {
 
     /**
      * Metodi palauttaa vokaali-inventoriosta vokaalin. Se ei saa olla sama kuin
-     * edellinen vokaali. Se myös korjaa ääntöväylän yksilöllisistä vaihteluista
-     * johtuvat erot korjauskertoimella. 
+     * edellinen vokaali. 
      * 
      * @return uusi vokaali
      */
@@ -66,14 +70,17 @@ public class Vokaalipeli implements Runnable {
     }
     
     /**
-     * Luodaan aikaikkunan koon avulla uusi Laskentakeskus
+     * Luodaan aikaikkunan koon avulla uusi Laskentakeskus. Palauttaa
      * 
      * @param ikkunanKoko aikaikkunan koko
+     * @return totuusarvo asettamisesta
      */
-    public void asetaAikaikkunanKoko(int ikkunanKoko) {
+    public boolean asetaAikaikkunanKoko(int ikkunanKoko) {
         if (onKakkosenPotenssi(ikkunanKoko)) {
             this.laskentakeskus = new LaskentaKeskus(ikkunanKoko);
+            return true;
         }
+        return false;
     }
 
     public void setKayttoliittyma(Kayttoliittyma kayttis) {
@@ -81,11 +88,11 @@ public class Vokaalipeli implements Runnable {
     }
 
     
-    public AudioInputStream getStriimi() {
+    public boolean aaniLahdeAsetettu() {
         if (this.aanilahde == null) {
-            return null;
+            return false;
         }
-        return this.aanilahde.getStriimi();
+        return true;
     }
 
     public void asetaIkkunafunktio(Ikkunafunktio funktio) {
@@ -112,12 +119,12 @@ public class Vokaalipeli implements Runnable {
         int aikaikkunanSiirtyma = (int) formaatti.getSampleRate() / 300; // uusi taulukko aloitetaan 300 krt/s
         int tavuaPerNayte = formaatti.getFrameSize();
         boolean bigEndian = formaatti.isBigEndian();
-
+        
         int naytteitaKasitelty = 0;
         int aikaikkunanPituus = this.laskentakeskus.getAikaikkunanPituus();
         Queue <double[][]> kasiteltavat = new ArrayDeque<>();                   
 
-        while (true) {  // ikuinen looppi !            
+        while (true) {     
 
             double luettuArvo = lueArvo(bigEndian, tavuaPerNayte);
 
@@ -212,10 +219,16 @@ public class Vokaalipeli implements Runnable {
 
     /**
      * Luo annetun vokaalin pohjalta uuden vokaalin, jonka jokainen formantti kerrotaan 
-     * korjauskeroimella.
+     * korjauskeroimella. Korjauskerroin kuvastaa ääntöväylän yksilöllisistä vaihteluista
+     * johtuvaa formanttitaajuuksien siirtymää. 
+     * 
+     * (Myös Taajuuskäyrässä pidetään kirjaa korjauskertoimesta, mutta siellä uuden 
+     * vokaalin saapuessa arvo asetetaan ykköseksi. Siellä siis muistetaan vain 
+     * muutokset edellisestä vokaalin asettamisesta.)
      * 
      * @param vokaali vokaali josta tehdään muokattu versio
      * @return vokaali korjatuilla formanttitaajuuksilla
+     * @see Taajuuskayra
      */    
     private Vokaali teeKorjaus(Vokaali vokaali) {        
         int[] vokaalinFormantit = vokaali.getFormantit();
