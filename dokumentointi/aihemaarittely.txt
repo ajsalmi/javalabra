@@ -2,6 +2,8 @@ VOKAALIPELI
 
 Aihe: peli vokaalien omaksumiseen  
 
-Toteutetaan ohjelma, joka antaa visuaalista palautetta siitä kuinka hyvin tuotetut vokaalit vastaavat opeteltavan kielen vokaaleja. Käyttäjä antaa syötteen mikrofonin välityksellä, ja syötteestä lasketaan nopella fourier-transformaatiolla (FFT, fast Fourier Trasformation) eri taajuuksien amplitudit. Saatu käyrä piirretään näytölle, ja yhdessä piirretään opeteltavan kielen vokaalin ensimmäiset kolme formanttitaajuutta. Käyttäjä voi siten verrata tuottamaansa äännettä kohdekielen vokaaliin. Käyttäjällä on mahdollisuus määritellä mm. näytteenottotaajuus ('sample rate') ja yksittäisten aikaikkunoiden koko (joka vaikuttaa taajuusresoluutioon).     
+Toteutetaan ohjelma, joka antaa visuaalista palautetta siitä kuinka hyvin tuotetut vokaalit vastaavat opeteltavan kielen vokaaleja. Käyttäjä antaa syötteen mikrofonin välityksellä, ja syötteestä lasketaan nopella fourier-transformaatiolla (FFT, fast Fourier Trasformation) eri taajuuksien amplitudit. Saatu käyrä piirretään näytölle, ja yhdessä piirretään opeteltavan kielen vokaalin ensimmäiset kolme formanttitaajuutta. Käyttäjä voi siten verrata tuottamaansa äännettä kohdekielen vokaaliin. 
+
+Aluksi käyttäjä voi määritellä mm. näytteenottotaajuuden ('sample rate') ja muut ääniformaatin ominaisuudet. Hänen on myös mahdollista valita aikaikkunan koko ja siihen sovellettava ikkunafunktio. Seuraavaksi alkaa itse peli, joka antaa ensin suomen vokaaleja. Pelin aikana käyttäjä voi säätää vokaalin formanteille piirrettyjä kaistaleita joko oikealle (korkeampi taajuus) tai vasemmalle (matalampi taajuus), jos tuotettujen äänteiden taajuuspiikit jäävät systemaattisesti jommallekummalle puolelle kaistaleita. Käyrää voi myös liikuttaa ylös tai alas, jos se näkyy liian pienenä tai suurena. Kun suomen vokaalit ovat kohdallaan ja käyttäjä tutustunut käyrään tarpeeksi, voidaan siirtyä vieraan kielen vokaalien harjoitteluun (HUOM. ei toteutettu vielä).
 
 

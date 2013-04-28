@@ -29,6 +29,7 @@ päivä	tuntia		seloste
 25.4.	2		kokeiluja yliopiston koneilla
 26.4.	5		formanttien siirtely toimii yms.
 27.4	4		luokkien siistimistä
+28.4.	4		testejä, pieniä muokkauksia, loppuviilausta
 
 
 
